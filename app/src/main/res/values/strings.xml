@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Ping Server</string>
+    <string name="service_running_label_off">Not pinging any server.</string>
+    <string name="service_running_label_success">Successfully pinged %1$s at %2$s</string>
+    <string name="service_running_label_fail">Unable to ping %1$s at %2$s</string>
+    <string name="server_text_view">Enter server to ping:</string>
+    <string name="server_hint">192.168.1.1</string>
+    <string name="delay_text_view_1">Ping every </string>
+    <string name="delay_text_view_2"> minutes</string>
+    <string name="start_service_button_text">Start Pinging</string>
+    <string name="update_result_button_text">Refresh</string>
+
+    <string name="notification_title">Ping failed!</string>
+    <string name="notification_text">Failed to ping server %1$s</string>
+
+    <string name="server_key">server</string>
+    <string name="delay_key">delay</string>
+</resources>
