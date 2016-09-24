@@ -21,4 +21,5 @@
 
     <color name="success">@color/green</color>
     <color name="fail">#af0000</color>
+    <color name="inactive">#cfcf00</color>
 </resources>

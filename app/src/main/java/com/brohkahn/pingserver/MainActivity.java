@@ -1,17 +1,16 @@
 package com.brohkahn.pingserver;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.NumberPicker;
@@ -48,33 +47,36 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        refreshResults(null);
-
         super.onResume();
+
+        refreshResults();
     }
 
-    public void refreshResults(View view) {
-        PingResultsDbHelper helper = new PingResultsDbHelper(this);
-        Ping lastPing = helper.getLastPing();
-        helper.close();
+    public void refreshResultsButtonClick(View view) {
+        refreshResults();
+    }
 
+    public void refreshResults() {
         TextView serviceRunning = (TextView) findViewById(R.id.service_running_label);
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (MyService.class.getName().equals(service.service.getClassName())) {
-                int stringId;
-                int colorId;
-                if (lastPing.result == Ping.PING_SUCCESS) {
-                    stringId = R.string.service_running_label_success;
-                    colorId = R.color.success;
-                } else {
-                    stringId = R.string.service_running_label_fail;
-                    colorId = R.color.fail;
-                }
-                serviceRunning.setText(String.format(getResources().getString(stringId), lastPing.server, lastPing.date));
-                serviceRunning.setTextColor(getResources().getColor(colorId));
-                break;
+        if (MyService.isRunning) {
+            PingResultsDbHelper helper = new PingResultsDbHelper(this);
+            Ping lastPing = helper.getLastPing();
+            helper.close();
+
+            int stringId;
+            int colorId;
+            if (lastPing.result == Ping.PING_SUCCESS) {
+                stringId = R.string.service_running_label_success;
+                colorId = R.color.success;
+            } else {
+                stringId = R.string.service_running_label_fail;
+                colorId = R.color.fail;
             }
+            serviceRunning.setText(String.format(getResources().getString(stringId), lastPing.server, lastPing.date));
+            serviceRunning.setTextColor(getResources().getColor(colorId));
+        } else {
+            serviceRunning.setText(getResources().getText(R.string.service_running_label_off));
+            serviceRunning.setTextColor(getResources().getColor(R.color.inactive));
         }
     }
 
@@ -84,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startPingService();
         }
+    }
+
+    public void stopServiceButtonClick(View view) {
+        Intent intent = new Intent(this, MyService.class);
+        stopService(intent);
     }
 
     public void startPingService() {
@@ -98,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
 
         Intent intent = new Intent(this, MyService.class);
+        stopService(intent);
         startService(intent);
     }
 

@@ -10,22 +10,26 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MyService extends Service {
+    public static boolean isRunning = false;
+
     private final int TIMEOUT = 5000;
     private final int NOTIFICATION_ID = 132432;
 
-    private Handler handler;
+    private Timer timer;
     private String server;
     private int delay;
 
@@ -42,19 +46,33 @@ public class MyService extends Service {
         server = preferences.getString(serverKey, "192.168.1.1");
         delay = preferences.getInt(delayKey, 5) * 60 * 1000;
 
-        handler = new Handler();
+        sendToast("Sending first ping");
 
-        pingServer();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                pingServer();
+            }
+        }, 0, delay);
+
+        isRunning = true;
 
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            pingServer();
-        }
-    };
+    public void sendToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDestroy() {
+        sendToast("Stopping pings");
+
+        isRunning = false;
+        timer.cancel();
+        super.onDestroy();
+    }
 
     private void pingServer() {
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
@@ -82,7 +100,6 @@ public class MyService extends Service {
             if (result != Ping.PING_SUCCESS) {
                 sentFailNotification();
             }
-            handler.postDelayed(runnable, delay);
         }
     }
 

@@ -53,7 +53,7 @@ public class PingResultsDbHelper extends SQLiteOpenHelper {
 
         String sortOrder = PingResult.COLUMN_NAME_DATE + " DESC";
 
-        Cursor c = db.query(PingResult.TABLE_NAME, projection, null, null, null, null, sortOrder);
+        Cursor c = db.query(PingResult.TABLE_NAME, projection, null, null, null, null, sortOrder, "1");
 
         Ping lastPing = null;
         if (c.moveToFirst()) {
