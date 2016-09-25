@@ -1,78 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/default_margin"
-    android:paddingLeft="@dimen/default_margin"
-    android:paddingRight="@dimen/default_margin"
-    android:paddingTop="@dimen/default_margin"
     tools:context="com.brohkahn.pingserver.MainActivity">
-
-
-    <TextView
-        android:id="@+id/service_running_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="refreshResultsButtonClick"
-        android:text="@string/service_running_label_off" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="refreshResultsButtonClick"
-        android:text="@string/update_result_button_text" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_margin"
-        android:labelFor="@+id/server_edit_text"
-        android:text="@string/server_text_view" />
-
-    <EditText
-        android:id="@+id/server_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text"
-        android:padding="@dimen/default_margin" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_margin"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/default_margin"
+        android:paddingLeft="@dimen/default_margin"
+        android:paddingRight="@dimen/default_margin"
+        android:paddingTop="@dimen/default_margin">
 
         <TextView
+            android:id="@+id/service_running_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/delay_text_view_1" />
+            android:autoLink="web"
+            android:onClick="refreshResultsButtonClick"
+            android:text="@string/service_running_label_off" />
 
-        <NumberPicker
-            android:id="@+id/delay_number_picker"
+        <Button
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:onClick="refreshResultsButtonClick"
+            android:text="@string/update_result_button_text" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/delay_text_view_2" />
+            android:layout_marginTop="@dimen/default_margin"
+            android:labelFor="@+id/server_edit_text"
+            android:text="@string/server_text_view" />
+
+        <EditText
+            android:id="@+id/server_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:padding="@dimen/default_margin" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/delay_text_view_1" />
+
+            <NumberPicker
+                android:id="@+id/delay_number_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/delay_text_view_2" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_margin"
+            android:onClick="startServiceButtonClick"
+            android:text="@string/start_service_button_text" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_margin"
+            android:onClick="stopServiceButtonClick"
+            android:text="@string/stop_service_button_text" />
     </LinearLayout>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_margin"
-        android:onClick="startServiceButtonClick"
-        android:text="@string/start_service_button_text" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_margin"
-        android:onClick="stopServiceButtonClick"
-        android:text="@string/stop_service_button_text" />
-</LinearLayout>
+</ScrollView>

@@ -17,6 +17,10 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
     private final int PERMISSION_REQUEST_INTERNET = 0;
 
@@ -72,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 stringId = R.string.service_running_label_fail;
                 colorId = R.color.fail;
             }
+
             serviceRunning.setText(String.format(getResources().getString(stringId), lastPing.server, lastPing.date));
             serviceRunning.setTextColor(getResources().getColor(colorId));
         } else {

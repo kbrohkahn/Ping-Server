@@ -31,7 +31,6 @@ public class MyService extends Service {
 
     private Timer timer;
     private String server;
-    private int delay;
 
     public MyService() {
     }
@@ -44,7 +43,7 @@ public class MyService extends Service {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         server = preferences.getString(serverKey, "192.168.1.1");
-        delay = preferences.getInt(delayKey, 5) * 60 * 1000;
+        int delay = preferences.getInt(delayKey, 5) * 60 * 1000;
 
         sendToast("Sending first ping");
 

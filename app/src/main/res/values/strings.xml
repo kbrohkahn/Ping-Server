@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Ping Server</string>
     <string name="service_running_label_off">Not pinging any server.</string>
-    <string name="service_running_label_success">Successfully pinged %1$s at %2$s</string>
-    <string name="service_running_label_fail">Unable to ping %1$s at %2$s</string>
+    <string name="service_running_label_success">Successfully pinged %1$s at %2$s UTC</string>
+    <string name="service_running_label_fail">Unable to ping %1$s at %2$s UTC</string>
     <string name="server_text_view">Enter server to ping:</string>
     <string name="server_hint">192.168.1.1</string>
     <string name="delay_text_view_1">Ping every </string>
