@@ -89,8 +89,9 @@ public class MyService extends Service {
                 result = Ping.PING_ERROR_HOST;
             } catch (IOException e) {
                 result = Ping.PING_ERROR_IO;
-            }
-            return result;
+
+            } return result;
+
         }
 
         protected void onPostExecute(Integer result) {
