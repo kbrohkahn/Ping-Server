@@ -13,6 +13,12 @@
     <!--<color name="green_darker">#166711</color>-->
     <color name="green_darkest">#034500</color>
 
+    <color name="red">#af0000</color>
+    <color name="red_darkest">#7f0000</color>
+
+    <color name="yellow">#cfcf00</color>
+    <color name="yellow_darkest">#7f7f00</color>
+
     <color name="green_transparent">#3f328A2E</color>
 
     <color name="primary">@color/blue</color>
@@ -21,7 +27,10 @@
 
     <color name="list_item_text_color">#ffffff</color>
 
+    <color name="success_dark">@color/green_darkest</color>
     <color name="success">@color/green</color>
-    <color name="fail">#af0000</color>
-    <color name="inactive">#cfcf00</color>
+    <color name="fail_dark">@color/red_darkest</color>
+    <color name="fail">@color/red</color>
+    <color name="inactive_dark">@color/yellow_darkest</color>
+    <color name="inactive">@color/yellow</color>
 </resources>

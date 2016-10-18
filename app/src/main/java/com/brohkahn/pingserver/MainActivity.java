@@ -25,11 +25,27 @@ import com.brohkahn.loggerlibrary.LogViewList;
 public class MainActivity extends AppCompatActivity {
     private final int PERMISSION_REQUEST_INTERNET = 0;
 
+    private static int lastPingResult = -1;
+
     private EditText serverEditText;
     private NumberPicker delayNumberPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (MyService.isRunning) {
+            PingResultsDbHelper helper = new PingResultsDbHelper(this);
+            Ping lastPing = helper.getLastPing();
+
+            helper.close();
+
+            lastPingResult = lastPing.result;
+            if (lastPingResult == Ping.PING_SUCCESS) {
+                getApplication().setTheme(R.style.theme_success);
+            } else {
+                getApplication().setTheme(R.style.theme_fail);
+            }
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -68,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
             Ping lastPing = helper.getLastPing();
             helper.close();
 
+            if (lastPingResult != lastPing.result) {
+                lastPingResult = lastPing.result;
+                recreate();
+            }
+
             int stringId;
             int colorId;
             if (lastPing.result == Ping.PING_SUCCESS) {
@@ -77,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 stringId = R.string.service_running_label_fail;
                 colorId = R.color.fail;
             }
+
 
             serviceRunning.setText(String.format(getResources().getString(stringId), lastPing.server, lastPing.date));
             serviceRunning.setTextColor(getResources().getColor(colorId));
