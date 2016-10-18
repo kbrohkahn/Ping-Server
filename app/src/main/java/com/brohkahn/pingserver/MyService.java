@@ -17,17 +17,23 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import com.brohkahn.loggerlibrary.LogDBHelper;
+import com.brohkahn.loggerlibrary.LogEntry;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyService extends Service {
+    public static final String TAG = "MyService";
+
     public static boolean isRunning = false;
 
     private final int TIMEOUT = 5000;
-    private final int NOTIFICATION_ID = 132432;
+    private final int NOTIFICATION_ID = 412;
 
     private Timer timer;
     private String server;
@@ -45,6 +51,9 @@ public class MyService extends Service {
         server = preferences.getString(serverKey, "192.168.1.1");
         int delay = preferences.getInt(delayKey, 5) * 60 * 1000;
 
+        logEvent(String.format(Locale.US, "Service starting, will ping %s every %d ms.", server, delay),
+                "PingServerTask",
+                LogEntry.LogLevel.Warning);
         sendToast("Sending first ping");
 
         timer = new Timer();
@@ -66,10 +75,15 @@ public class MyService extends Service {
 
     @Override
     public void onDestroy() {
-        sendToast("Stopping pings");
+        String message = String.format(Locale.US, "Stopping pings of %s.", server);
+        sendToast(message);
+        logEvent(message, "PingServerTask", LogEntry.LogLevel.Warning);
 
         isRunning = false;
+
         timer.cancel();
+        timer.purge();
+        timer = null;
         super.onDestroy();
     }
 
@@ -87,10 +101,17 @@ public class MyService extends Service {
                 result = InetAddress.getByName(server).isReachable(TIMEOUT) ? Ping.PING_SUCCESS : Ping.PING_FAIL;
             } catch (UnknownHostException e) {
                 result = Ping.PING_ERROR_HOST;
+                logEvent(String.format(Locale.US, "UnknownHostException when pinging %s.", server),
+                        "PingServerTask",
+                        LogEntry.LogLevel.Warning);
             } catch (IOException e) {
                 result = Ping.PING_ERROR_IO;
+                logEvent(String.format(Locale.US, "IOException when pinging %s.", server),
+                        "PingServerTask",
+                        LogEntry.LogLevel.Warning);
 
-            } return result;
+            }
+            return result;
 
         }
 
@@ -98,7 +119,14 @@ public class MyService extends Service {
             savePingResult(result);
 
             if (result != Ping.PING_SUCCESS) {
+                logEvent(String.format(Locale.US, "Failed to ping %s.", server),
+                        "PingServerTask",
+                        LogEntry.LogLevel.Message);
                 sentFailNotification();
+            } else {
+                logEvent(String.format(Locale.US, "Successfully pinged %s.", server),
+                        "PingServerTask",
+                        LogEntry.LogLevel.Message);
             }
         }
     }
@@ -123,11 +151,16 @@ public class MyService extends Service {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    private void logEvent(String message, String function, LogEntry.LogLevel level) {
+        LogDBHelper.saveLogEntry(this, message, null, TAG, function, level);
     }
 }

@@ -18,15 +18,33 @@
             android:id="@+id/service_running_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_margin"
             android:autoLink="web"
             android:onClick="refreshResultsButtonClick"
             android:text="@string/service_running_label_off" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="refreshResultsButtonClick"
-            android:text="@string/update_result_button_text" />
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="refreshResultsButtonClick"
+                android:text="@string/update_result_button_text" />
+
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="viewPings"
+                android:text="@string/action_view_pings" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -45,7 +63,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin"
+            android:layout_margin="@dimen/default_margin"
             android:orientation="horizontal">
 
             <TextView
@@ -66,18 +84,26 @@
                 android:text="@string/delay_text_view_2" />
         </LinearLayout>
 
-        <Button
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin"
-            android:onClick="startServiceButtonClick"
-            android:text="@string/start_service_button_text" />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin"
-            android:onClick="stopServiceButtonClick"
-            android:text="@string/stop_service_button_text" />
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="startServiceButtonClick"
+                android:text="@string/start_service_button_text" />
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="stopServiceButtonClick"
+                android:text="@string/stop_service_button_text" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

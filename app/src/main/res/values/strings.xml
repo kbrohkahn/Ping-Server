@@ -9,7 +9,9 @@
     <string name="delay_text_view_2"> minutes</string>
     <string name="start_service_button_text">Start Pinging</string>
     <string name="stop_service_button_text">Stop Pinging</string>
-    <string name="update_result_button_text">Refresh</string>
+    <string name="update_result_button_text">Refresh status</string>
+    <string name="action_view_pings">View pings</string>
+    <string name="action_view_logs">View logs</string>
 
     <string name="notification_title">Ping failed!</string>
     <string name="notification_text">Failed to ping server %1$s</string>

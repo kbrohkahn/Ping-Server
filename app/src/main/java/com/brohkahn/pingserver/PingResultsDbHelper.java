@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import java.util.Date;
+
 public class PingResultsDbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
@@ -35,6 +37,7 @@ public class PingResultsDbHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(PingResult.COLUMN_NAME_SERVER, server);
         values.put(PingResult.COLUMN_NAME_RESULT, result);
+        values.put(PingResult.COLUMN_NAME_DATE, new Date().getTime());
 
         long rows = db.insert(PingResult.TABLE_NAME, null, values);
         db.close();

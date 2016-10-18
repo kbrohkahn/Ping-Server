@@ -19,6 +19,8 @@
     <color name="primary_dark">@color/green_darkest</color>
     <color name="secondary">@color/green</color>
 
+    <color name="list_item_text_color">#ffffff</color>
+
     <color name="success">@color/green</color>
     <color name="fail">#af0000</color>
     <color name="inactive">#cfcf00</color>
