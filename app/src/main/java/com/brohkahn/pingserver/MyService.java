@@ -130,18 +130,18 @@ public class MyService extends Service {
 								Constants.PING_FAIL;
 					} catch (UnknownHostException e) {
 						result = Constants.PING_ERROR_HOST;
-						logEvent(String.format(Locale.US, "UnknownHostException when pinging %s.", server),
+						logEvent(String.format(Locale.US, "UnknownHostException when pinging %s.", server.name),
 								"PingServerTask",
 								LogEntry.LogLevel.Warning);
 					} catch (IOException e) {
 						result = Constants.PING_ERROR_IO;
-						logEvent(String.format(Locale.US, "IOException when pinging %s.", server),
+						logEvent(String.format(Locale.US, "IOException when pinging %s.", server.name),
 								"PingServerTask",
 								LogEntry.LogLevel.Warning);
 					}
 
 					if (server.lastResult != Constants.PING_SUCCESS) {
-						logEvent(String.format(Locale.US, "Failed to ping %s.", server),
+						logEvent(String.format(Locale.US, "Failed to ping %s.", server.name),
 								"PingServerTask",
 								LogEntry.LogLevel.Message);
 					} else {

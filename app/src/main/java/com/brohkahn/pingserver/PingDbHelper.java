@@ -95,7 +95,7 @@ class PingDbHelper extends SQLiteOpenHelper {
 
 		return String.format(Locale.US,
 				"select s.%s, s.%s, s.%s, p.%s, p.%s from %s s left join %s p on s.%s=p.%s where s.%s=1 " +
-						"order by p.%s desc, s.%s asc",
+						"group by s.%s order by p.%s desc, s.%s asc",
 				ServerColumns._ID,
 				ServerColumns.COLUMN_NAME_SERVER,
 				ServerColumns.COLUMN_NAME_ACTIVE,
@@ -106,6 +106,7 @@ class PingDbHelper extends SQLiteOpenHelper {
 				ServerColumns._ID,
 				PingResultColumns.COLUMN_NAME_RELATED_SERVER,
 				ServerColumns.COLUMN_NAME_ACTIVE,
+				ServerColumns._ID,
 				PingResultColumns.COLUMN_NAME_DATE,
 				ServerColumns.COLUMN_NAME_SERVER);
 	}
