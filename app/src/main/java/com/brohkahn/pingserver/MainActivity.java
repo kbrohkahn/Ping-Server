@@ -1,182 +1,176 @@
 package com.brohkahn.pingserver;
 
-import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.NumberPicker;
+import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.brohkahn.loggerlibrary.LogViewList;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
-    private final int PERMISSION_REQUEST_INTERNET = 0;
 
-    private static int lastPingResult = -1;
+	public ServerListAdapter adapter;
 
-    private EditText serverEditText;
-    private NumberPicker delayNumberPicker;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (MyService.isRunning) {
-            PingResultsDbHelper helper = new PingResultsDbHelper(this);
-            Ping lastPing = helper.getLastPing();
+		Toolbar toolbar = (Toolbar) findViewById(R.id.activity_main_toolbar);
+		setSupportActionBar(toolbar);
 
-            helper.close();
+		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.activity_main_fab);
+		fab.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				startAddPingActivity();
+			}
+		});
 
-            lastPingResult = lastPing.result;
-            if (lastPingResult == Ping.PING_SUCCESS) {
-                getApplication().setTheme(R.style.theme_success);
-            } else {
-                getApplication().setTheme(R.style.theme_fail);
-            }
-        }
+		adapter = new ServerListAdapter(this, getCursorLoader().loadInBackground(), 0);
+		((ListView) findViewById(R.id.main_list_view)).setAdapter(adapter);
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+		if (!MyService.isRunning) {
+			startService(new Intent(getApplicationContext(), MyService.class));
+		}
+	}
 
-        final Resources resources = getResources();
-        String serverKey = resources.getString(R.string.server_key);
-        String delayKey = resources.getString(R.string.delay_key);
+	private CursorLoader getCursorLoader() {
+		return new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
+			@Override
+			public Cursor loadInBackground() {
+				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
+				SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String server = preferences.getString(serverKey, "192.168.1.1");
-        int delay = preferences.getInt(delayKey, 5);
+				return db.rawQuery(dbHelper.getServerSelect(), null);
+			}
+		};
+	}
 
-        serverEditText = (EditText) findViewById(R.id.server_edit_text);
-        serverEditText.setText(server);
+	private void startAddPingActivity() {
+		startActivity(new Intent(this, AddServer.class));
+	}
 
-        delayNumberPicker = (NumberPicker) findViewById(R.id.delay_number_picker);
-        delayNumberPicker.setMinValue(1);
-        delayNumberPicker.setMaxValue(60);
-        delayNumberPicker.setValue(delay);
-    }
+	@Override
+	protected void onResume() {
+		super.onResume();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        refreshResults();
-    }
-
-    public void refreshResultsButtonClick(View view) {
-        refreshResults();
-    }
-
-    public void refreshResults() {
-        TextView serviceRunning = (TextView) findViewById(R.id.service_running_label);
-        if (MyService.isRunning) {
-            PingResultsDbHelper helper = new PingResultsDbHelper(this);
-            Ping lastPing = helper.getLastPing();
-            helper.close();
-
-            if (lastPingResult != lastPing.result) {
-                lastPingResult = lastPing.result;
-                recreate();
-            }
-
-            int stringId;
-            int colorId;
-            if (lastPing.result == Ping.PING_SUCCESS) {
-                stringId = R.string.service_running_label_success;
-                colorId = R.color.success;
-            } else {
-                stringId = R.string.service_running_label_fail;
-                colorId = R.color.fail;
-            }
+		refreshResults();
+	}
 
 
-            serviceRunning.setText(String.format(getResources().getString(stringId), lastPing.server, lastPing.date));
-            serviceRunning.setTextColor(getResources().getColor(colorId));
-        } else {
-            serviceRunning.setText(getResources().getText(R.string.service_running_label_off));
-            serviceRunning.setTextColor(getResources().getColor(R.color.inactive));
-        }
-    }
+	@Override
+	protected void onPause() {
+		adapter.getCursor().close();
 
-    public void startServiceButtonClick(View view) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_INTERNET);
-        } else {
-            startPingService();
-        }
-    }
-
-    public void stopServiceButtonClick(View view) {
-        Intent intent = new Intent(this, MyService.class);
-        stopService(intent);
-    }
-
-    public void viewPings(View view) {
-        startActivity(new Intent(this, PingListView.class));
-    }
-
-    public void startPingService() {
-        // save preferences
-        final Resources resources = getResources();
-        String serverKey = resources.getString(R.string.server_key);
-        String delayKey = resources.getString(R.string.delay_key);
-
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-        editor.putString(serverKey, serverEditText.getText().toString());
-        editor.putInt(delayKey, delayNumberPicker.getValue());
-        editor.apply();
-
-        Intent intent = new Intent(this, MyService.class);
-        stopService(intent);
-        startService(intent);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_INTERNET: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startPingService();
-                } else {
-                    Toast.makeText(this, "Cannot ping a server without internet permission.", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            }
-        }
-    }
+		super.onPause();
+	}
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main, menu);
-        return true;
-    }
+	public void refreshResults() {
+		adapter.swapCursor(getCursorLoader().loadInBackground());
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.action_view_logs:
-                startActivity(new Intent(this, LogViewList.class));
-                return true;
 
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return true;
+	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case R.id.action_view_pings:
+				viewPings(-1);
+				return true;
+			case R.id.action_view_logs:
+				startActivity(new Intent(this, LogViewList.class));
+				return true;
+			case R.id.action_about:
+				startActivity(new Intent(this, AboutActivity.class));
+				return true;
+			case R.id.action_settings:
+				startActivity(new Intent(this, SettingsActivity.class));
+				return true;
+
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+
+	public class ServerListAdapter extends CursorAdapter {
+
+		private SimpleDateFormat dateFormat;
+		private int successColor;
+		private int failColor;
+
+		private ServerListAdapter(Context context, Cursor cursor, int flags) {
+			super(context, cursor, flags);
+
+			dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
+
+			successColor = ContextCompat.getColor(context, R.color.success);
+			failColor = ContextCompat.getColor(context, R.color.fail);
+		}
+
+		public void bindView(View view, Context context, Cursor cursor) {
+			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
+			Date date = new Date();
+			date.setTime(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
+			dateTextView.setText(dateFormat.format(date));
+
+			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
+			serverTextView.setText(cursor.getString(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns.COLUMN_NAME_SERVER)));
+
+			int result = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_RESULT));
+			if (result == Constants.PING_SUCCESS) {
+				view.setBackgroundColor(successColor);
+			} else {
+				view.setBackgroundColor(failColor);
+			}
+
+			final int id = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns._ID));
+			view.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					viewPings(id);
+				}
+			});
+		}
+
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return LayoutInflater.from(context)
+					.inflate(R.layout.ping_list_item, parent, false);
+		}
+	}
+
+	private void viewPings(int id) {
+		Intent intent = new Intent(this, PingListView.class);
+		intent.putExtra(PingListView.KEY_SERVER_ID, id);
+		startActivity(intent);
+	}
 }

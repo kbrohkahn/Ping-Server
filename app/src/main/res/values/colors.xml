@@ -1,36 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue">#2E4272</color>
-    <!--<color name="blue_lighter">#4F618F</color>-->
-    <color name="blue_lightest">#7887AB</color>
-    <!--<color name="blue_darker">#162856</color>-->
-    <color name="blue_darkest">#061539</color>
-    <color name="blue_transparent">#3f2E4272</color>
+	<color name="green">#328A2E</color>
+	<color name="green_darkest">#034500</color>
 
-    <color name="green">#328A2E</color>
-    <!--<color name="green_lighter">#5AAC56</color>-->
-    <color name="green_lightest">#8DCF8A</color>
-    <!--<color name="green_darker">#166711</color>-->
-    <color name="green_darkest">#034500</color>
+	<color name="red">#af0000</color>
+	<color name="red_darkest">#7f0000</color>
 
-    <color name="red">#af0000</color>
-    <color name="red_darkest">#7f0000</color>
+	<color name="yellow">#cfcf00</color>
+	<color name="yellow_darkest">#7f7f00</color>
 
-    <color name="yellow">#cfcf00</color>
-    <color name="yellow_darkest">#7f7f00</color>
+	<color name="white">#ffffff</color>
 
-    <color name="green_transparent">#3f328A2E</color>
+	<color name="text_color">#9fffffff</color>
 
-    <color name="primary">@color/blue</color>
-    <color name="primary_dark">@color/green_darkest</color>
-    <color name="secondary">@color/green</color>
+	<color name="green_transparent">#3f328A2E</color>
 
-    <color name="list_item_text_color">#ffffff</color>
+	<color name="primary">#122460</color>
+	<color name="primary_dark">#12182E</color>
+	<color name="secondary">#790A39</color>
 
-    <color name="success_dark">@color/green_darkest</color>
-    <color name="success">@color/green</color>
-    <color name="fail_dark">@color/red_darkest</color>
-    <color name="fail">@color/red</color>
-    <color name="inactive_dark">@color/yellow_darkest</color>
-    <color name="inactive">@color/yellow</color>
+	<color name="list_item_text_color">@color/text_color</color>
+	<color name="window_background">#efefef</color>
+
+	<color name="success_dark">@color/green_darkest</color>
+	<color name="success">@color/green</color>
+	<color name="fail_dark">@color/red_darkest</color>
+	<color name="fail">@color/red</color>
+	<color name="inactive_dark">@color/yellow_darkest</color>
+	<color name="inactive">@color/yellow</color>
 </resources>

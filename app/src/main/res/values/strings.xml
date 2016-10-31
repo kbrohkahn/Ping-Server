@@ -1,21 +1,72 @@
 <resources>
-    <string name="app_name">Ping Server</string>
-    <string name="service_running_label_off">Not pinging any server.</string>
-    <string name="service_running_label_success">Successfully pinged %1$s at %2$s UTC</string>
-    <string name="service_running_label_fail">Unable to ping %1$s at %2$s UTC</string>
-    <string name="server_text_view">Enter server to ping:</string>
-    <string name="server_hint">192.168.1.1</string>
-    <string name="delay_text_view_1">Ping every </string>
-    <string name="delay_text_view_2"> minutes</string>
-    <string name="start_service_button_text">Start Pinging</string>
-    <string name="stop_service_button_text">Stop Pinging</string>
-    <string name="update_result_button_text">Refresh status</string>
-    <string name="action_view_pings">View pings</string>
-    <string name="action_view_logs">View logs</string>
+	<string name="app_name">Ping Server</string>
+	<string name="developer_email">kevin@broh-kahn.com</string>
+	<string name="developer_name">Kevin Broh-Kahn</string>
+	<!--<string name="service_running_label_off">Not pinging any server.</string>-->
+	<!--<string name="service_running_label_success">Successfully pinged %1$s at %2$s UTC</string>-->
+	<!--<string name="service_running_label_fail">Unable to ping %1$s at %2$s UTC</string>-->
+	<!--<string name="delay_text_view_1">Ping every </string>-->
+	<!--<string name="delay_text_view_2"> minutes</string>-->
+	<!--<string name="update_result_button_text">Refresh status</string>-->
+	<string name="save">Save</string>
+	<string name="cancel">Cancel</string>
+	<string name="deactivate">Deactivate</string>
 
-    <string name="notification_title">Ping failed!</string>
-    <string name="notification_text">Failed to ping server %1$s</string>
+	<!-- Actions and activities -->
+	<string name="action_view_pings">View pings</string>
+	<string name="action_view_logs">View logs</string>
+	<string name="activity_add_ping">Add Ping</string>
+	<string name="activity_about">About</string>
+	<string name="activity_settings">Settings</string>
 
-    <string name="server_key">server</string>
-    <string name="delay_key">delay</string>
+	<!-- Notification -->
+	<string name="notification_title">Ping failed!</string>
+	<string name="notification_text">Failed to ping server %1$s</string>
+
+	<!-- Add server -->
+	<string name="server_text_view">Enter server to ping:</string>
+	<string name="server_hint">192.168.1.1</string>
+
+	<!-- About -->
+	<string name="about_package_text">Package %1$s</string>
+	<string name="about_version_text">Version %1$s</string>
+	<string name="about_developer_text">Developed by %1$s</string>
+	<string name="about_app_text">Please do not hesitate to send any feedback or questions to %1$s!</string>
+
+
+	<!-- Settings -->
+	<!--<string name="server_key">server</string>-->
+	<string name="key_delay">delay</string>
+	<string name="key_retries">retries</string>
+
+	<string name="title_delay">Ping Frequency</string>
+	<string name="title_retries">Retries before failure</string>
+	<string name="title_activity_settings">Settings</string>
+
+	<!-- Strings related to Settings -->
+
+	<!-- Example General settings -->
+	<string name="pref_header_general">General</string>
+
+	<string name="pref_title_social_recommendations">Enable social recommendations</string>
+	<string name="pref_description_social_recommendations">Recommendations for people to contact based on your message
+		history
+	</string>
+
+	<string name="pref_title_display_name">Display name</string>
+	<string name="pref_default_display_name">John Smith</string>
+
+	<string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+	<string-array name="pref_example_list_titles">
+		<item>Always</item>
+		<item>When possible</item>
+		<item>Never</item>
+	</string-array>
+	<string-array name="pref_example_list_values">
+		<item>1</item>
+		<item>0</item>
+		<item>-1</item>
+	</string-array>
+
+
 </resources>

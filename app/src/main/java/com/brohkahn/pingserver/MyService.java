@@ -23,144 +23,195 @@ import com.brohkahn.loggerlibrary.LogEntry;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class MyService extends Service {
-    public static final String TAG = "MyService";
+	public static final String TAG = "MyService";
 
-    public static boolean isRunning = false;
+	public static boolean isRunning = false;
 
-    private final int TIMEOUT = 5000;
-    private final int NOTIFICATION_ID = 412;
+	private Timer timer = new Timer();
+	private PingServerTask pingServerTask;
 
-    private Timer timer;
-    private String server;
+	//	private static String server;
+	private static int retries;
 
-    public MyService() {
-    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        final Resources resources = getResources();
-        String serverKey = resources.getString(R.string.server_key);
-        String delayKey = resources.getString(R.string.delay_key);
+	public MyService() {
+	}
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        server = preferences.getString(serverKey, "192.168.1.1");
-        int delay = preferences.getInt(delayKey, 5) * 60 * 1000;
+	@Override
+	public void onCreate() {
+		super.onCreate();
 
-        logEvent(String.format(Locale.US, "Service starting, will ping %s every %d ms.", server, delay),
-                "PingServerTask",
-                LogEntry.LogLevel.Warning);
-        sendToast("Sending first ping");
+		isRunning = true;
 
-        timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                pingServer();
-            }
-        }, 0, delay);
+		Resources resources = getResources();
+		String delayKey = resources.getString(R.string.key_delay);
+		String retriesKey = resources.getString(R.string.key_retries);
 
-        isRunning = true;
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		retries = Integer.parseInt(preferences.getString(retriesKey, "3"));
+		int delay = Integer.parseInt(preferences.getString(delayKey, "5")) * 60 * 1000;
+//           delay = 1000;
 
-        return super.onStartCommand(intent, flags, startId);
-    }
+		logEvent(String.format(Locale.US, "Service starting, will ping every %d ms.", delay),
+				"PingServerTask",
+				LogEntry.LogLevel.Warning);
+		sendToast("Sending first ping");
 
-    public void sendToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				pingServer();
+			}
+		}, 0, delay);
 
-    @Override
-    public void onDestroy() {
-        String message = String.format(Locale.US, "Stopping pings of %s.", server);
-        sendToast(message);
-        logEvent(message, "PingServerTask", LogEntry.LogLevel.Warning);
+	}
 
-        isRunning = false;
+	public void sendToast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+	}
 
-        timer.cancel();
-        timer.purge();
-        timer = null;
-        super.onDestroy();
-    }
+	@Override
+	public void onDestroy() {
+		String message = "Stopping pings.";
+		sendToast(message);
+		logEvent(message, "PingServerTask", LogEntry.LogLevel.Warning);
 
-    private void pingServer() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            new PingServerTask().execute(null, null);
-        }
-    }
+		isRunning = false;
 
-    private class PingServerTask extends AsyncTask<Void, Void, Integer> {
-        protected Integer doInBackground(Void... params) {
-            int result;
-            try {
-                result = InetAddress.getByName(server).isReachable(TIMEOUT) ? Ping.PING_SUCCESS : Ping.PING_FAIL;
-            } catch (UnknownHostException e) {
-                result = Ping.PING_ERROR_HOST;
-                logEvent(String.format(Locale.US, "UnknownHostException when pinging %s.", server),
-                        "PingServerTask",
-                        LogEntry.LogLevel.Warning);
-            } catch (IOException e) {
-                result = Ping.PING_ERROR_IO;
-                logEvent(String.format(Locale.US, "IOException when pinging %s.", server),
-                        "PingServerTask",
-                        LogEntry.LogLevel.Warning);
+		if (pingServerTask != null) {
+			pingServerTask.cancel(true);
+			pingServerTask = null;
+		}
 
-            }
-            return result;
+		timer.cancel();
+		timer.purge();
+		timer = null;
 
-        }
+		super.onDestroy();
+	}
 
-        protected void onPostExecute(Integer result) {
-            savePingResult(result);
+	private void pingServer() {
+		int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
+		if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+			pingServerTask = new PingServerTask(getApplicationContext());
+			pingServerTask.execute(null, null);
+		}
+	}
 
-            if (result != Ping.PING_SUCCESS) {
-                logEvent(String.format(Locale.US, "Failed to ping %s.", server),
-                        "PingServerTask",
-                        LogEntry.LogLevel.Message);
-                sentFailNotification();
-            } else {
-                logEvent(String.format(Locale.US, "Successfully pinged %s.", server),
-                        "PingServerTask",
-                        LogEntry.LogLevel.Message);
-            }
-        }
-    }
+	private static class PingServerTask extends AsyncTask<Void, Void, Void> {
+		private Context context;
 
-    public void savePingResult(int result) {
-        PingResultsDbHelper helper = new PingResultsDbHelper(this);
-        helper.savePing(server, result);
-        helper.close();
-    }
+		private final int TIMEOUT = 5000;
+		private final int NOTIFICATION_ID = 412;
 
-    public void sentFailNotification() {
-        final Resources resources = getResources();
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_notification)
-                        .setContentTitle(resources.getString(R.string.notification_title))
-                        .setVibrate(new long[]{1000, 1000})
-                        .setLights(Color.BLUE, 1000, 3000)
-                        .setContentText(String.format(resources.getString(R.string.notification_text), server));
-        mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+		private List<Server> servers;
 
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+		private PingServerTask(Context context) {
+			this.context = context;
 
-    }
+			PingDbHelper pingDbHelper = PingDbHelper.getHelper(context);
+			servers = pingDbHelper.getActiveServers();
+			pingDbHelper.close();
+		}
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+		protected Void doInBackground(Void... params) {
+			for (Server server : servers) {
+				int result = Constants.PING_FAIL;
+				int count = 0;
+				while (count < retries && result != Constants.PING_SUCCESS) {
+					try {
+						result = InetAddress.getByName(server.name).isReachable(TIMEOUT) ? Constants.PING_SUCCESS :
+								Constants.PING_FAIL;
+					} catch (UnknownHostException e) {
+						result = Constants.PING_ERROR_HOST;
+						logEvent(String.format(Locale.US, "UnknownHostException when pinging %s.", server),
+								"PingServerTask",
+								LogEntry.LogLevel.Warning);
+					} catch (IOException e) {
+						result = Constants.PING_ERROR_IO;
+						logEvent(String.format(Locale.US, "IOException when pinging %s.", server),
+								"PingServerTask",
+								LogEntry.LogLevel.Warning);
+					}
 
-    private void logEvent(String message, String function, LogEntry.LogLevel level) {
-        LogDBHelper.saveLogEntry(this, message, null, TAG, function, level);
-    }
+					if (server.lastResult != Constants.PING_SUCCESS) {
+						logEvent(String.format(Locale.US, "Failed to ping %s.", server),
+								"PingServerTask",
+								LogEntry.LogLevel.Message);
+					} else {
+						logEvent(String.format(Locale.US, "Successfully pinged %s.", server),
+								"PingServerTask",
+								LogEntry.LogLevel.Message);
+					}
+				}
+
+				server.lastResult = result;
+			}
+
+			PingDbHelper helper = PingDbHelper.getHelper(context);
+			helper.savePingResults(servers);
+			helper.close();
+
+			return null;
+		}
+
+		protected void onPostExecute(Void result) {
+			int worstPing = Constants.PING_SUCCESS;
+			String failMessage = "Failed to ping servers: ";
+
+			for (Server server : servers) {
+				if (server.lastResult != Constants.PING_SUCCESS) {
+					worstPing = server.lastResult;
+					failMessage += server.name + ", ";
+				}
+			}
+
+			if (worstPing != Constants.PING_SUCCESS) {
+				sentFailNotification(failMessage.substring(0, failMessage.length() - 2));
+			}
+		}
+
+		private void logEvent(String message, String function, LogEntry.LogLevel level) {
+			LogDBHelper helper = LogDBHelper.getHelper(context);
+			helper.saveLogEntry(message, null, TAG, function, level);
+			helper.close();
+		}
+
+
+		private void sentFailNotification(String message) {
+			Resources resources = context.getResources();
+			NotificationCompat.Builder mBuilder =
+					new NotificationCompat.Builder(context)
+							.setSmallIcon(R.drawable.ic_notification)
+							.setContentTitle(resources.getString(R.string.notification_title))
+							.setVibrate(new long[]{1000, 1000})
+							.setLights(Color.BLUE, 1000, 3000)
+							.setContentText(message);
+			mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
+
+			NotificationManager mNotificationManager =
+					(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+			mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+		}
+	}
+
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO: Return the communication channel to the service.
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
+
+	private void logEvent(String message, String function, LogEntry.LogLevel level) {
+		LogDBHelper helper = LogDBHelper.getHelper(this);
+		helper.saveLogEntry(message, null, TAG, function, level);
+		helper.close();
+	}
 }

@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<EditTextPreference
+			android:defaultValue="5"
+			android:inputType="number"
+			android:key="@string/key_delay"
+			android:maxLines="1"
+			android:selectAllOnFocus="true"
+			android:singleLine="true"
+			android:title="@string/title_delay"/>
+
+	<EditTextPreference
+			android:defaultValue="3"
+			android:inputType="number"
+			android:key="@string/key_retries"
+			android:maxLines="1"
+			android:selectAllOnFocus="true"
+			android:singleLine="true"
+			android:title="@string/title_retries"/>
+
+</PreferenceScreen>

@@ -3,10 +3,17 @@ package com.brohkahn.pingserver;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -17,68 +24,98 @@ import java.util.Date;
 import java.util.Locale;
 
 public class PingListView extends AppCompatActivity {
-    private Cursor pingCursor;
+	public static String KEY_SERVER_ID = "serverId";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+	private int serverId;
 
-        setContentView(R.layout.ping_list_view);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-        PingResultsDbHelper helper = new PingResultsDbHelper(this);
+		setContentView(R.layout.activity_view_pings);
 
-        SQLiteDatabase db = helper.getReadableDatabase();
+		setSupportActionBar((Toolbar) findViewById(R.id.ping_list_view_toolbar));
 
-        String query = String.format(Locale.US, "SELECT * FROM %s ORDER BY %s DESC",
-                PingResultsDbHelper.PingResult.TABLE_NAME,
-                PingResultsDbHelper.PingResult.COLUMN_NAME_DATE);
-        pingCursor = db.rawQuery(query, null);
+		if (getSupportActionBar() != null) {
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		}
 
-        PingListAdaper adapter = new PingListAdaper(this, pingCursor, 0);
+		serverId = getIntent().getIntExtra(KEY_SERVER_ID, -1);
 
-        ListView listView = (ListView) findViewById(R.id.ping_list_view);
-        listView.setAdapter(adapter);
+		CursorLoader cursorLoader = new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
+			@Override
+			public Cursor loadInBackground() {
+				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
+				SQLiteDatabase db = dbHelper.getReadableDatabase();
+				return db.rawQuery(dbHelper.getPingSelect(serverId), null);
+			}
+		};
 
-        helper.close();
-    }
+		ListView listView = (ListView) findViewById(R.id.ping_list_view);
+		listView.setAdapter(new PingListAdapter(getApplicationContext(), cursorLoader.loadInBackground(), 0));
 
-    @Override
-    protected void onDestroy() {
-        pingCursor.close();
-        super.onDestroy();
-    }
+	}
 
-    public class PingListAdaper extends CursorAdapter {
-        private SimpleDateFormat dateFormat;
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.ping_list_view, menu);
+		return true;
+	}
 
-        public PingListAdaper(Context context, Cursor cursor, int flags) {
-            super(context, cursor, flags);
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle item selection
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				finish();
+				return true;
+			case R.id.action_deactivate:
+				PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
+				pingDbHelper.deactivateServer(serverId);
+				pingDbHelper.close();
+				finish();
+				return true;
 
-            dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
-        }
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 
-        public void bindView(View view, Context context, Cursor cursor) {
-            final int result = cursor.getInt(cursor.getColumnIndexOrThrow(PingResultsDbHelper.PingResult.COLUMN_NAME_RESULT));
-            int colorResID;
-            if (result == Ping.PING_SUCCESS) {
-                colorResID = R.color.success;
-            } else {
-                colorResID = R.color.error;
-            }
-            view.setBackgroundColor(getResources().getColor(colorResID));
+	private static class PingListAdapter extends CursorAdapter {
+		private SimpleDateFormat dateFormat;
+		private int successColor;
+		private int failColor;
 
-            TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
-            Date date = new Date();
-            date.setTime(cursor.getLong(cursor.getColumnIndexOrThrow(PingResultsDbHelper.PingResult.COLUMN_NAME_DATE)));
-            dateTextView.setText(dateFormat.format(date));
+		private PingListAdapter(Context context, Cursor cursor, int flags) {
+			super(context, cursor, flags);
 
-            TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
-            serverTextView.setText(cursor.getString(cursor.getColumnIndexOrThrow(PingResultsDbHelper.PingResult.COLUMN_NAME_SERVER)));
+			dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
 
-        }
+			successColor = ContextCompat.getColor(context, R.color.success);
+			failColor = ContextCompat.getColor(context, R.color.fail);
+		}
 
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(context).inflate(R.layout.ping_list_item, parent, false);
-        }
-    }
+		public void bindView(View view, Context context, Cursor cursor) {
+			final int result = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_RESULT));
+
+			if (result == Constants.PING_SUCCESS) {
+				view.setBackgroundColor(successColor);
+			} else {
+				view.setBackgroundColor(failColor);
+			}
+
+			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
+			Date date = new Date();
+			date.setTime(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
+			dateTextView.setText(dateFormat.format(date));
+
+			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
+			serverTextView.setText(cursor.getString(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns.COLUMN_NAME_SERVER)));
+		}
+
+		public View newView(Context context, Cursor cursor, ViewGroup parent) {
+			return LayoutInflater.from(context).inflate(R.layout.ping_list_item, parent, false);
+		}
+	}
 }
