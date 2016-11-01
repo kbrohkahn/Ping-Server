@@ -2,7 +2,6 @@ package com.brohkahn.pingserver;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -35,7 +34,8 @@ public class AddServer extends AppCompatActivity {
 		helper.saveServer(server);
 		helper.close();
 
-		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Constants.ACTION_RESCHEDULE_PINGS));
+
+		sendBroadcast(new Intent(Constants.ACTION_RESCHEDULE_PINGS));
 	}
 
 	@Override
