@@ -49,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
 		adapter = new ServerListAdapter(this, getCursorLoader().loadInBackground(), 0);
 		((ListView) findViewById(R.id.main_list_view)).setAdapter(adapter);
-
-		if (!MyService.isRunning) {
-			startService(new Intent(getApplicationContext(), MyService.class));
-		}
 	}
 
 	private CursorLoader getCursorLoader() {
