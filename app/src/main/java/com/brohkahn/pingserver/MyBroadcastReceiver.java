@@ -18,6 +18,8 @@ import java.util.Locale;
 public class MyBroadcastReceiver extends BroadcastReceiver {
 	private static final String TAG = "MyBroadcastReceiver";
 
+	private static final int MS_MINUTE = 60 * 1000;
+
 	public MyBroadcastReceiver() {
 	}
 
@@ -32,7 +34,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 		} else {
 			String delayKey = context.getResources().getString(R.string.key_delay);
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-			int delay = Integer.parseInt(preferences.getString(delayKey, "5")) * 60 * 1000;
+			int delay = Integer.parseInt(preferences.getString(delayKey, "5"));
 //           delay = 1000;
 
 			// create intent and pending intent for DownloadRSSService
@@ -44,7 +46,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			alarmManager.cancel(schedulePingIntent);
-			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, 0, delay, schedulePingIntent);
+			alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, 0, delay * MS_MINUTE, schedulePingIntent);
 
 			logEvent(context, String.format(Locale.US, "Scheduled pingIntent every %d minutes", delay));
 		}

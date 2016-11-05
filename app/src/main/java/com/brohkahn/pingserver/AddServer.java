@@ -34,7 +34,6 @@ public class AddServer extends AppCompatActivity {
 		helper.saveServer(server);
 		helper.close();
 
-
 		sendBroadcast(new Intent(Constants.ACTION_RESCHEDULE_PINGS));
 	}
 

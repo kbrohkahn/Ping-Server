@@ -83,15 +83,6 @@ class PingDbHelper extends SQLiteOpenHelper {
 	}
 
 	String getServerSelect() {
-//		return String.format(Locale.US,
-//				"select %s.%s, %s, %s from %s where %s=1 order by %s asc",
-//				ServerColumns.TABLE_NAME,
-//				ServerColumns._ID,
-//				ServerColumns.COLUMN_NAME_SERVER,
-//				ServerColumns.COLUMN_NAME_ACTIVE,
-//				ServerColumns.TABLE_NAME,
-//				ServerColumns.COLUMN_NAME_ACTIVE,
-//				ServerColumns.COLUMN_NAME_SERVER);
 
 		return String.format(Locale.US,
 				"select s.%s, s.%s, s.%s, p.%s, p.%s from %s s left join %s p on s.%s=p.%s where s.%s=1 " +
@@ -138,6 +129,34 @@ class PingDbHelper extends SQLiteOpenHelper {
 		db.close();
 
 		return servers;
+	}
+
+	Server getServer(int id) {
+		SQLiteDatabase db = getReadableDatabase();
+
+		String query = "select " + ServerColumns._ID
+				+ ", " + ServerColumns.COLUMN_NAME_SERVER
+				+ ", " + ServerColumns.COLUMN_NAME_ACTIVE
+				+ " from " + ServerColumns.TABLE_NAME
+				+ " where " + ServerColumns._ID + "=" + String.valueOf(id);
+		Cursor cursor = db.rawQuery(query, null);
+
+		Server server = null;
+		boolean valuesInCursor = cursor.moveToFirst();
+		if (valuesInCursor) {
+			server = new Server(
+					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns._ID)),
+					cursor.getString(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_SERVER)),
+//					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)),
+					0,
+					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_ACTIVE)) == 1
+			);
+		}
+
+		cursor.close();
+		db.close();
+		return server;
+
 	}
 
 	String getPingSelect(int serverId) {

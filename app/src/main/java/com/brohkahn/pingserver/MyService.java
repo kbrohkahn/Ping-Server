@@ -2,6 +2,7 @@ package com.brohkahn.pingserver;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -110,6 +111,9 @@ public class MyService extends IntentService {
 	}
 
 	private void sentFailNotification(String message) {
+		Intent intent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
 		Resources resources = getResources();
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(this)
@@ -117,7 +121,9 @@ public class MyService extends IntentService {
 						.setContentTitle(resources.getString(R.string.notification_title))
 						.setVibrate(new long[]{1000, 1000})
 						.setLights(Color.BLUE, 1000, 3000)
-						.setContentText(message);
+						.setContentText(message)
+						.setContentIntent(pendingIntent);
+
 		mBuilder.setSound(Settings.System.DEFAULT_NOTIFICATION_URI);
 
 		NotificationManager mNotificationManager =
