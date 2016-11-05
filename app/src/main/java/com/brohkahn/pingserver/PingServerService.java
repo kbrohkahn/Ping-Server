@@ -21,19 +21,19 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
-public class MyService extends IntentService {
-	public static final String TAG = "MyService";
+public class PingServerService extends IntentService {
+	public static final String TAG = "PingServerService";
 
 	private static final int NOTIFICATION_ID = 12341435;
 
-	public MyService() {
-		super("MyService");
+	public PingServerService() {
+		super("PingServerService");
 	}
 
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		if (intent != null && intent.getAction().equals(Constants.ACTION_RESCHEDULE_PINGS)) {
+		if (intent != null && intent.getAction().equals(Constants.ACTION_PING)) {
 			// get servers
 			PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
 			List<Server> servers = pingDbHelper.getActiveServers();

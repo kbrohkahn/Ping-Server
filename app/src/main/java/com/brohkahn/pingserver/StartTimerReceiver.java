@@ -15,12 +15,12 @@ import com.brohkahn.loggerlibrary.LogEntry;
 import java.util.List;
 import java.util.Locale;
 
-public class MyBroadcastReceiver extends BroadcastReceiver {
-	private static final String TAG = "MyBroadcastReceiver";
+public class StartTimerReceiver extends BroadcastReceiver {
+	private static final String TAG = "StartTimerReceiver";
 
 	private static final int MS_MINUTE = 60 * 1000;
 
-	public MyBroadcastReceiver() {
+	public StartTimerReceiver() {
 	}
 
 	@Override
@@ -38,11 +38,10 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
 //           delay = 1000;
 
 			// create intent and pending intent for DownloadRSSService
-			Intent pingIntent = new Intent(context, MyService.class);
-			pingIntent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+			Intent pingIntent = new Intent(context, PingServerReceiver.class);
 
 			// create pending intent, cancel (if already running), and reschedule
-			PendingIntent schedulePingIntent = PendingIntent.getService(context, 0, pingIntent, 0);
+			PendingIntent schedulePingIntent = PendingIntent.getBroadcast(context, 0, pingIntent, 0);
 
 			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			alarmManager.cancel(schedulePingIntent);

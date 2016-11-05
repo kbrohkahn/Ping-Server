@@ -16,12 +16,13 @@
 		<activity android:name=".MainActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
+
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
 
 		<receiver
-				android:name=".MyBroadcastReceiver"
+				android:name=".StartTimerReceiver"
 				android:enabled="true"
 				android:exported="false">
 			<intent-filter>
@@ -29,15 +30,20 @@
 				<action android:name="com.brohkahn.pingserver.action.reschedule_pings"/>
 			</intent-filter>
 		</receiver>
+		<receiver
+				android:name=".PingServerReceiver"
+				android:enabled="true">
+			<intent-filter>
+				<action android:name="com.brohkahn.pingserver.action.ping"/>
+			</intent-filter>
+		</receiver>
 
 		<service
-				android:name=".MyService"
+				android:name=".PingServerService"
 				android:enabled="true"/>
-
 		<activity
 				android:name=".PingListView"
 				android:label="@string/action_view_pings"/>
-
 		<activity
 				android:name=".AddServer"
 				android:label="@string/activity_add_ping"/>
