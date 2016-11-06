@@ -2,6 +2,7 @@ package com.brohkahn.pingserver;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -24,6 +25,7 @@ import android.view.MenuItem;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
 	/**
 	 * A preference value change listener that updates the preference's summary
 	 * to reflect its new value.
@@ -99,6 +101,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	}
 
 	public static class SettingsFragment extends PreferenceFragment {
+		public int currentDelay;
+
+		@Override
+		public void onStop() {
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			String delayKey = getResources().getString(R.string.key_delay);
+			int newDelay = Integer.parseInt(preferences.getString(delayKey, "5"));
+
+			if (currentDelay != newDelay) {
+				currentDelay = newDelay;
+				Intent intent = new Intent(getActivity(), StartTimerService.class);
+				intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+				getActivity().startService(intent);
+			}
+
+			super.onStop();
+		}
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
@@ -106,7 +126,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			setHasOptionsMenu(true);
 
 			Resources resources = getResources();
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_delay)));
+
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			String delayKey = resources.getString(R.string.key_delay);
+			currentDelay = Integer.parseInt(preferences.getString(delayKey, "5"));
+
+			bindPreferenceSummaryToValue(findPreference(delayKey));
 			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries)));
 		}
 

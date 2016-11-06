@@ -6,6 +6,8 @@ class Constants {
 	static final int PING_ERROR_HOST = 10;
 	static final int PING_ERROR_IO = 11;
 
+	static final int NOTIFICATION_ID = 12341435;
+
 	private static final String PACKAGE_ACTION = "com.brohkahn.pingserver.action.";
 	static final String ACTION_RESCHEDULE_PINGS = PACKAGE_ACTION + "reschedule_pings";
 	static final String ACTION_PING = PACKAGE_ACTION + "ping";

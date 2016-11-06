@@ -24,7 +24,6 @@ import java.util.Locale;
 public class PingServerService extends IntentService {
 	public static final String TAG = "PingServerService";
 
-	private static final int NOTIFICATION_ID = 12341435;
 
 	public PingServerService() {
 		super("PingServerService");
@@ -120,7 +119,7 @@ public class PingServerService extends IntentService {
 				new NotificationCompat.Builder(this)
 						.setSmallIcon(R.drawable.ic_notification)
 						.setContentTitle(resources.getString(R.string.notification_title))
-						.setVibrate(new long[]{1000, 1000})
+						.setVibrate(new long[]{250, 250})
 						.setLights(Color.BLUE, 1000, 3000)
 						.setContentText(message)
 						.setContentIntent(pendingIntent);
@@ -129,8 +128,8 @@ public class PingServerService extends IntentService {
 
 		NotificationManager mNotificationManager =
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
+		mNotificationManager.cancel(Constants.NOTIFICATION_ID);
+		mNotificationManager.notify(Constants.NOTIFICATION_ID, mBuilder.build());
 	}
 
 	private void logEvent(String message, String function, LogEntry.LogLevel level) {

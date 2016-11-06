@@ -1,5 +1,6 @@
 package com.brohkahn.pingserver;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -55,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
 		adapter = new ServerListAdapter(this, getCursorLoader().loadInBackground(), 0);
 		((ListView) findViewById(R.id.main_list_view)).setAdapter(adapter);
+
+		NotificationManager mNotificationManager =
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(Constants.NOTIFICATION_ID);
+
 	}
 
 	private CursorLoader getCursorLoader() {

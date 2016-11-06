@@ -1,7 +1,9 @@
 package com.brohkahn.pingserver;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -28,15 +30,48 @@ public class AddServer extends AppCompatActivity {
 
 	}
 
-	private void savePing() {
-		String server = serverEditText.getText().toString();
-		PingDbHelper helper = PingDbHelper.getHelper(getApplicationContext());
-		helper.saveServer(server);
-		helper.close();
+	@Override
+	public void onBackPressed() {
+		String serverName = serverEditText.getText().toString();
 
-		Intent intent = new Intent(this, StartTimerService.class);
-		intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
-		startService(intent);
+		if (serverName.equals("")) {
+			super.onBackPressed();
+		} else {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string.save_title)
+					.setMessage(getResources().getString(R.string.save_message, serverName))
+					.setPositiveButton(R.string.save_positive, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							saveServer();
+							dialogInterface.dismiss();
+							finish();
+						}
+					})
+					.setNegativeButton(R.string.save_negative, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							dialogInterface.dismiss();
+							finish();
+
+						}
+					});
+
+			builder.create().show();
+		}
+	}
+
+	private void saveServer() {
+		String serverName = serverEditText.getText().toString();
+		if (!serverName.equals("")) {
+			PingDbHelper helper = PingDbHelper.getHelper(getApplicationContext());
+			helper.saveServer(serverName);
+			helper.close();
+
+			Intent intent = new Intent(this, StartTimerService.class);
+			intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+			startService(intent);
+		}
 	}
 
 	@Override
@@ -54,13 +89,12 @@ public class AddServer extends AppCompatActivity {
 				finish();
 				return true;
 			case R.id.action_save:
-				savePing();
+				saveServer();
 				finish();
 				return true;
 			case R.id.action_cancel:
 				finish();
 				return true;
-
 			default:
 				return super.onOptionsItemSelected(item);
 		}

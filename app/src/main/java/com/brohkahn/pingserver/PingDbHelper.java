@@ -223,15 +223,15 @@ class PingDbHelper extends SQLiteOpenHelper {
 	}
 
 	boolean deactivateServer(int id) {
-		String select = String.format(Locale.US, "%s=%d", ServerColumns._ID, id);
+		SQLiteDatabase db = getWritableDatabase();
 
-		SQLiteDatabase db = getReadableDatabase();
+		// delete ping history
+		String deletePingsWhere = PingResultColumns.COLUMN_NAME_RELATED_SERVER + "=" + String.valueOf(id);
+		db.delete(PingResultColumns.TABLE_NAME, deletePingsWhere, null);
 
-		ContentValues values = new ContentValues();
-		values.put(ServerColumns.COLUMN_NAME_ACTIVE, 0);
-
-		return db.update(ServerColumns.TABLE_NAME, values, select, null) == 1;
-
+		// delete server
+		String deleteServerWhere = ServerColumns._ID + "=" + String.valueOf(id);
+		return db.delete(ServerColumns.TABLE_NAME, deleteServerWhere, null) == 1;
 	}
 
 	static class PingResultColumns implements BaseColumns {

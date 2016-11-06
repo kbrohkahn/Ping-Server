@@ -1,26 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<color name="green">#328A2E</color>
-	<color name="green_darkest">#034500</color>
 
-	<color name="red">#af0000</color>
-	<color name="red_darkest">#7f0000</color>
+	<!--http://paletton.com/#uid=33x0G0k++lD+r7I+FfJ++rr++Dp-->
 
-	<color name="yellow">#cfcf00</color>
-	<color name="yellow_darkest">#7f7f00</color>
+	<color name="primary_0">#003F6F</color>
+	<color name="primary_1">#001627</color>
+	<color name="primary_2">#002E51</color>
+	<color name="primary_3">#00508D</color>
+	<color name="primary_4">#006ABC</color>
+	<color name="secondary_1_0">#AC8D00</color>
+	<color name="secondary_1_1">#3D3200</color>
+	<color name="secondary_1_2">#7D6600</color>
+	<color name="secondary_1_3">#DBB300</color>
+	<color name="secondary_1_4">#FFD100</color>
+	<color name="secondary_2_0">#AC0900</color>
+	<color name="secondary_2_1">#3D0300</color>
+	<color name="secondary_2_2">#7D0600</color>
+	<color name="secondary_2_3">#DB0B00</color>
+	<color name="secondary_2_4">#FF0D00</color>
+
+	<color name="green">#008a00</color>
+	<color name="green_darkest">#006400</color>
+
+	<color name="red">@color/secondary_2_0</color>
+	<color name="red_darkest">@color/secondary_2_2</color>
+
+	<color name="yellow">@color/secondary_1_0</color>
+	<color name="yellow_darkest">@color/secondary_1_2</color>
 
 	<color name="white">#ffffff</color>
-
 	<color name="text_color">#9fffffff</color>
-
 	<color name="green_transparent">#3f328A2E</color>
-
-	<color name="primary">#122460</color>
-	<color name="primary_dark">#12182E</color>
-	<color name="secondary">#790A39</color>
-
-	<color name="list_item_text_color">@color/text_color</color>
 	<color name="window_background">#efefef</color>
+
+	<color name="primary">@color/primary_0</color>
+	<color name="primary_dark">@color/primary_1</color>
+	<color name="secondary">@color/secondary_1_0</color>
 
 	<color name="success_dark">@color/green_darkest</color>
 	<color name="success">@color/green</color>

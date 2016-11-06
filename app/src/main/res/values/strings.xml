@@ -33,6 +33,12 @@
 	<string name="deactivate_positive">Yes, stop</string>
 	<string name="deactivate_negative">No, continue</string>
 
+	<!-- Save server -->
+	<string name="save_title">Save server</string>
+	<string name="save_message">Do you want to save and start pinging %1$s?</string>
+	<string name="save_positive">Save</string>
+	<string name="save_negative">Discard</string>
+
 	<!-- About -->
 	<string name="about_package_text">Package %1$s</string>
 	<string name="about_version_text">Version %1$s</string>
