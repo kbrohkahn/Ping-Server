@@ -83,23 +83,17 @@ class PingDbHelper extends SQLiteOpenHelper {
 	}
 
 	String getServerSelect() {
-
-		return String.format(Locale.US,
-				"select s.%s, s.%s, s.%s, p.%s, p.%s from %s s left join %s p on s.%s=p.%s where s.%s=1 " +
-						"group by s.%s order by p.%s desc, s.%s asc",
-				ServerColumns._ID,
-				ServerColumns.COLUMN_NAME_SERVER,
-				ServerColumns.COLUMN_NAME_ACTIVE,
-				PingResultColumns.COLUMN_NAME_RESULT,
-				PingResultColumns.COLUMN_NAME_DATE,
-				ServerColumns.TABLE_NAME,
-				PingResultColumns.TABLE_NAME,
-				ServerColumns._ID,
-				PingResultColumns.COLUMN_NAME_RELATED_SERVER,
-				ServerColumns.COLUMN_NAME_ACTIVE,
-				ServerColumns._ID,
-				PingResultColumns.COLUMN_NAME_DATE,
-				ServerColumns.COLUMN_NAME_SERVER);
+		return "select s." + ServerColumns._ID +
+				", s." + ServerColumns.COLUMN_NAME_SERVER +
+				", s." + ServerColumns.COLUMN_NAME_ACTIVE +
+				", p." + PingResultColumns.COLUMN_NAME_RESULT +
+				", p." + PingResultColumns.COLUMN_NAME_DATE +
+				" from " + ServerColumns.TABLE_NAME + " s " +
+				" left join " + PingResultColumns.TABLE_NAME + " p " +
+				" on s." + ServerColumns._ID + "=p." + PingResultColumns.COLUMN_NAME_RELATED_SERVER +
+				" where s." + ServerColumns.COLUMN_NAME_ACTIVE + "=1" +
+				" group by s." + ServerColumns._ID +
+				" order by s." + ServerColumns.COLUMN_NAME_SERVER + " asc";
 	}
 
 	List<Server> getActiveServers() {
@@ -160,26 +154,18 @@ class PingDbHelper extends SQLiteOpenHelper {
 	}
 
 	String getPingSelect(int serverId) {
-		String serverSelect;
-		if (serverId > -1) {
-			serverSelect = String.format(Locale.US, "where %s.%s=%d",
-					ServerColumns.TABLE_NAME,
-					ServerColumns._ID,
-					serverId);
-		} else {
-			serverSelect = "";
-		}
-		return String.format(Locale.US,
-				"select * from %s left join %s on %s.%s=%s.%s %s order by %s asc, %s desc",
-				PingResultColumns.TABLE_NAME,
-				ServerColumns.TABLE_NAME,
-				PingResultColumns.TABLE_NAME,
-				PingResultColumns.COLUMN_NAME_RELATED_SERVER,
-				ServerColumns.TABLE_NAME,
-				ServerColumns._ID,
-				serverSelect,
-				ServerColumns.COLUMN_NAME_SERVER,
-				PingResultColumns.COLUMN_NAME_DATE);
+		String whereClause = serverId > -1 ?
+				" where " + ServerColumns.TABLE_NAME + "." + ServerColumns._ID + "=" + String.valueOf(serverId)
+				: "";
+
+		return "select * " +
+				" from " + PingResultColumns.TABLE_NAME +
+				" left join " + ServerColumns.TABLE_NAME +
+				" on " + ServerColumns.TABLE_NAME + "." + ServerColumns._ID +
+				"= " + PingResultColumns.TABLE_NAME + "." + PingResultColumns.COLUMN_NAME_RELATED_SERVER +
+				whereClause +
+				" order by " + PingResultColumns.COLUMN_NAME_DATE + " desc, " +
+				PingResultColumns.COLUMN_NAME_DATE + " asc";
 	}
 
 //	List<Ping> getPings(int serverId) {

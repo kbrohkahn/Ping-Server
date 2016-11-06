@@ -30,10 +30,9 @@ public class PingServerService extends IntentService {
 		super("PingServerService");
 	}
 
-
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		if (intent != null && intent.getAction().equals(Constants.ACTION_PING)) {
+		if (intent.getAction().equals(Constants.ACTION_PING)) {
 			// get servers
 			PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
 			List<Server> servers = pingDbHelper.getActiveServers();
@@ -108,6 +107,8 @@ public class PingServerService extends IntentService {
 			// log end
 			logEvent("Finished pinging servers", "PingServerTask", LogEntry.LogLevel.Trace);
 		}
+
+		PingServerReceiver.completeWakefulIntent(intent);
 	}
 
 	private void sentFailNotification(String message) {

@@ -6,6 +6,7 @@
 
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+	<uses-permission android:name="android.permission.WAKE_LOCK"/>
 
 	<application
 			android:allowBackup="true"
@@ -22,26 +23,6 @@
 			</intent-filter>
 		</activity>
 
-		<receiver
-				android:name=".StartTimerReceiver"
-				android:enabled="true"
-				android:exported="false">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED"/>
-				<action android:name="com.brohkahn.pingserver.action.reschedule_pings"/>
-			</intent-filter>
-		</receiver>
-		<receiver
-				android:name=".PingServerReceiver"
-				android:enabled="true">
-			<intent-filter>
-				<action android:name="com.brohkahn.pingserver.action.ping"/>
-			</intent-filter>
-		</receiver>
-
-		<service
-				android:name=".PingServerService"
-				android:enabled="true"/>
 		<activity
 				android:name=".PingListView"
 				android:label="@string/action_view_pings"/>
@@ -55,6 +36,21 @@
 				android:name=".SettingsActivity"
 				android:label="@string/title_activity_settings"
 				android:theme="@style/AppTheme_WithActionBar"/>
+
+		<receiver android:name=".BootCompletedReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED"/>
+			</intent-filter>
+		</receiver>
+		<receiver android:name=".PingServerReceiver">
+			<intent-filter>
+				<action android:name="com.brohkahn.pingserver.action.ping"/>
+			</intent-filter>
+		</receiver>
+
+		<service android:name=".PingServerService"/>
+		<service android:name=".StartTimerService"/>
+
 	</application>
 
 </manifest>

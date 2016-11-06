@@ -98,7 +98,6 @@ public class PingListView extends AppCompatActivity {
 
 		public void bindView(View view, Context context, Cursor cursor) {
 			final int result = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_RESULT));
-
 			if (result == Constants.PING_SUCCESS) {
 				view.setBackgroundColor(successColor);
 			} else {
@@ -106,8 +105,7 @@ public class PingListView extends AppCompatActivity {
 			}
 
 			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
-			Date date = new Date();
-			date.setTime(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
+			Date date = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
 			dateTextView.setText(dateFormat.format(date));
 
 			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);

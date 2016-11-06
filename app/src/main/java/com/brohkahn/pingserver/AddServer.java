@@ -34,7 +34,9 @@ public class AddServer extends AppCompatActivity {
 		helper.saveServer(server);
 		helper.close();
 
-		sendBroadcast(new Intent(Constants.ACTION_RESCHEDULE_PINGS));
+		Intent intent = new Intent(this, StartTimerService.class);
+		intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+		startService(intent);
 	}
 
 	@Override

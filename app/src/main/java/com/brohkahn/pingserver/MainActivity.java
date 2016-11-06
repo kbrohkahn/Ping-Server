@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
 			public Cursor loadInBackground() {
 				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
 				SQLiteDatabase db = dbHelper.getReadableDatabase();
-
 				return db.rawQuery(dbHelper.getServerSelect(), null);
 			}
 		};
@@ -141,8 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
 		public void bindView(View view, Context context, Cursor cursor) {
 			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
-			Date date = new Date();
-			date.setTime(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
+			Date date = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
 			dateTextView.setText(dateFormat.format(date));
 
 			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
