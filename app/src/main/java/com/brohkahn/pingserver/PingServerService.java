@@ -87,7 +87,7 @@ public class PingServerService extends IntentService {
 					worstPing = server.lastResult;
 					failMessage += server.name + ", ";
 				} else {
-					logMessage = String.format(Locale.US, "Successfully pinged %s.", server);
+					logMessage = String.format(Locale.US, "Successfully pinged %s.", server.name);
 					logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
 				}
 

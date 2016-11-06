@@ -8,8 +8,8 @@ android {
         applicationId "com.brohkahn.pingserver"
         minSdkVersion 17
         targetSdkVersion 25
-        return void
         vectorDrawables.useSupportLibrary = true
+        return void
     }
     buildTypes {
         release {
