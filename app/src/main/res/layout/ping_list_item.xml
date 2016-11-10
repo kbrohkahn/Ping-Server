@@ -11,8 +11,9 @@
 
 	<TextView
 			android:id="@+id/ping_date"
-			android:layout_width="@dimen/ping_list_item_date_width"
+			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_marginEnd="@dimen/activity_horizontal_margin"
 			android:textColor="@color/text_color"/>
 
 	<TextView

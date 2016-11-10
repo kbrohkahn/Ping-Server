@@ -132,7 +132,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			currentDelay = Integer.parseInt(preferences.getString(delayKey, "5"));
 
 			bindPreferenceSummaryToValue(findPreference(delayKey));
+			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_timeout)));
 			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries)));
+			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries_delay)));
 		}
 
 		@Override

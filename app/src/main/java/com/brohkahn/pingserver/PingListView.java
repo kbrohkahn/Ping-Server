@@ -150,7 +150,7 @@ public class PingListView extends AppCompatActivity {
 		private PingListAdapter(Context context, Cursor cursor, int flags) {
 			super(context, cursor, flags);
 
-			dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
+			dateFormat = new SimpleDateFormat("HH:mm MM/dd/yyyy", Locale.US);
 
 			successColor = ContextCompat.getColor(context, R.color.success);
 			failColor = ContextCompat.getColor(context, R.color.fail);

@@ -42,10 +42,14 @@ public class PingServerService extends IntentService {
 			logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
 
 			// get settings
-			String retriesKey = getResources().getString(R.string.key_retries);
+			Resources resources = getResources();
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-			int retries = Integer.parseInt(preferences.getString(retriesKey, "5"));
-			int timeout = Integer.parseInt(preferences.getString(retriesKey, "1")) * 1000;
+			int timeout = Integer.parseInt(preferences.getString(resources.getString(R.string.key_timeout), "1")) *
+					1000;
+			int retries = Integer.parseInt(preferences.getString(resources.getString(R.string.key_retries), "5"));
+			int retryDelay = Integer.parseInt(preferences.getString(resources.getString(R.string.key_retries_delay),
+					"1"));
+
 
 			// instantiate variables for notification
 			int worstPing = Constants.PING_SUCCESS;
@@ -75,6 +79,15 @@ public class PingServerService extends IntentService {
 						logMessage = String.format(Locale.US, "IOException when pinging %s.", server.name);
 						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
 					}
+
+					try {
+						Thread.sleep(1000 * retryDelay);
+					} catch (InterruptedException e) {
+						logEvent("InterruptedException when trying to sleep thread to delay retry",
+								"PingServerTask",
+								LogEntry.LogLevel.Warning);
+					}
+
 				}
 
 

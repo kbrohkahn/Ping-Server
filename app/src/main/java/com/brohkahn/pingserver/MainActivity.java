@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 		private ServerListAdapter(Context context, Cursor cursor, int flags) {
 			super(context, cursor, flags);
 
-			dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.US);
+			dateFormat = new SimpleDateFormat("HH:mm MM/dd/yyyy", Locale.US);
 
 			successColor = ContextCompat.getColor(context, R.color.success);
 			failColor = ContextCompat.getColor(context, R.color.fail);
@@ -146,8 +146,15 @@ public class MainActivity extends AppCompatActivity {
 
 		public void bindView(View view, Context context, Cursor cursor) {
 			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
-			Date date = new Date(cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_DATE)));
-			dateTextView.setText(dateFormat.format(date));
+
+			long timeInMillis = cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns
+					.COLUMN_NAME_DATE));
+			if (timeInMillis > 0) {
+				Date date = new Date(timeInMillis);
+				dateTextView.setText(dateFormat.format(date));
+			} else {
+				dateTextView.setText("");
+			}
 
 			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
 			serverTextView.setText(cursor.getString(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns.COLUMN_NAME_SERVER)));
@@ -211,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
 
 	public void deactivateServer(int id) {
 		PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
-		boolean success = pingDbHelper.deactivateServer(id);
 		Server server = pingDbHelper.getServer(id);
+		boolean success = pingDbHelper.deactivateServer(id);
 		pingDbHelper.close();
 
 		LogEntry.LogLevel level;
