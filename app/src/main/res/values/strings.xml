@@ -13,6 +13,7 @@
 	<string name="deactivate">Deactivate</string>
 	<string name="frequency">Frequency</string>
 	<string name="retries">Retries</string>
+	<string name="general">General</string>
 
 	<!-- Actions and activities -->
 	<string name="action_view_pings">View pings</string>
@@ -28,7 +29,7 @@
 
 	<!-- Add server -->
 	<string name="server_text_view">Enter server to ping:</string>
-	<string name="server_hint">192.168.1.1</string>
+	<string name="server_hint">espn.com</string>
 
 	<!-- Deactivate server -->
 	<string name="deactivate_title">Stop pinging server</string>
@@ -55,12 +56,18 @@
 	<string name="key_timeout">timeout</string>
 	<string name="key_retries">retries</string>
 	<string name="key_retries_delay">retriesDelay</string>
+	<string name="key_date_format">dateFormat</string>
 
 	<string name="title_delay">Ping Frequency (minutes)</string>
 	<string name="title_timeout_delay">Timeout (seconds)</string>
 	<string name="title_delay_inaccurate">Note: Frequency not exact</string>
 	<string name="title_retries">Retries before failure</string>
 	<string name="title_retry_delay">Delay before retry (seconds)</string>
+	<string name="title_date_format">Date format</string>
+
+	<string name="default_date_format">MM/dd/yyyy HH:mm</string>
+
+
 
 	<string name="summary_delay_inaccurate">Android devices control timers differently, if pings aren\'t occurring
 		at the above frequency try changing it by 20%.</string>

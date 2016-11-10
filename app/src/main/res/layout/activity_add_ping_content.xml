@@ -67,7 +67,7 @@
 				android:layout_width="match_parent"
 				android:hint="@string/server_hint"
 				android:layout_height="wrap_content"
-				android:inputType="text"
+				android:inputType="textUri"
 				android:padding="@dimen/default_margin"/>
 
 		<!--<LinearLayout-->

@@ -21,7 +21,7 @@
 				android:maxLines="1"
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
-				android:title="@string/key_timeout"/>
+				android:title="@string/title_timeout_delay"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/retries">
@@ -41,5 +41,16 @@
 				android:selectAllOnFocus="true"
 				android:singleLine="true"
 				android:title="@string/title_retry_delay"/>
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/general">
+		<EditTextPreference
+				android:defaultValue="@string/default_date_format"
+				android:inputType="text"
+				android:key="@string/key_date_format"
+				android:maxLines="1"
+				android:selectAllOnFocus="true"
+				android:singleLine="true"
+				android:title="@string/title_date_format"/>
 	</PreferenceCategory>
 </PreferenceScreen>

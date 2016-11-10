@@ -17,8 +17,7 @@
 			android:theme="@style/AppTheme">
 		<activity
 				android:name=".MainActivity"
-				android:launchMode="singleInstance"
-				>
+				android:launchMode="singleInstance">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 
@@ -38,6 +37,7 @@
 		<activity
 				android:name=".SettingsActivity"
 				android:label="@string/activity_settings"
+				android:launchMode="singleInstance"
 				android:theme="@style/AppTheme_WithActionBar"/>
 
 		<receiver android:name=".BootCompletedReceiver">

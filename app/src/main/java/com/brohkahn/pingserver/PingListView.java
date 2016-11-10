@@ -2,10 +2,13 @@ package com.brohkahn.pingserver;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.widget.CursorAdapter;
@@ -150,7 +153,12 @@ public class PingListView extends AppCompatActivity {
 		private PingListAdapter(Context context, Cursor cursor, int flags) {
 			super(context, cursor, flags);
 
-			dateFormat = new SimpleDateFormat("HH:mm MM/dd/yyyy", Locale.US);
+			Resources resources = context.getResources();
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+			String dateFormatString = preferences.getString(
+					resources.getString(R.string.key_date_format),
+					resources.getString(R.string.default_date_format));
+			dateFormat = new SimpleDateFormat(dateFormatString, Locale.US);
 
 			successColor = ContextCompat.getColor(context, R.color.success);
 			failColor = ContextCompat.getColor(context, R.color.fail);
