@@ -43,7 +43,7 @@ public class StartTimerService extends IntentService {
 				pingIntent.setAction(Constants.ACTION_PING);
 
 				// create pending intent, cancel (if already running), and reschedule
-				PendingIntent schedulePingIntent = PendingIntent.getBroadcast(this, 0, pingIntent, 0);
+				PendingIntent schedulePingIntent = PendingIntent.getBroadcast(this, Constants.BROADCAST_PING_CODE, pingIntent, 0);
 
 				AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 				alarmManager.cancel(schedulePingIntent);
