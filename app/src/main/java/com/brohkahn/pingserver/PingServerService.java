@@ -16,7 +16,9 @@ import com.brohkahn.loggerlibrary.LogDBHelper;
 import com.brohkahn.loggerlibrary.LogEntry;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +63,16 @@ public class PingServerService extends IntentService {
 				for (int tryCount = 0; tryCount < retries; tryCount++) {
 					try {
 						boolean reachable = InetAddress.getByName(server.name).isReachable(timeout);
+
+						if (!reachable) {
+							// try various java methods
+							URL url = new URL(server.name);
+							HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+							connection.setConnectTimeout(timeout);
+							connection.connect();
+							reachable = connection.getResponseCode() == 200;
+						}
+
 
 						if (reachable) {
 							result = Constants.PING_SUCCESS;
