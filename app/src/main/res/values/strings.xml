@@ -1,5 +1,5 @@
 <resources>
-	<string name="app_name">Ping Server</string>
+	<string name="app_name">Ping Servers</string>
 	<string name="developer_email">kevin@broh-kahn.com</string>
 	<string name="developer_name">Kevin Broh-Kahn</string>
 	<!--<string name="service_running_label_off">Not pinging any server.</string>-->
