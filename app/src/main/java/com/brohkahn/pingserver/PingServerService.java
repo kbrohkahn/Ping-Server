@@ -132,7 +132,12 @@ public class PingServerService extends IntentService {
 			logEvent("Finished pinging servers", "PingServerTask", LogEntry.LogLevel.Trace);
 		}
 
-		PingServerReceiver.completeWakefulIntent(intent);
+		sendBroadcast(new Intent(Constants.ACTION_PINGS_UPDATED));
+		
+		String intentSource = intent.getStringExtra(Constants.KEY_PING_INTENT_SOURCE);
+		if (intentSource != null && intentSource.equals(PingServerReceiver.TAG)) {
+			PingServerReceiver.completeWakefulIntent(intent);
+		}
 	}
 
 	private void sentFailNotification(String message) {

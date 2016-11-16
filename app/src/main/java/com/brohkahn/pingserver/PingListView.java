@@ -2,6 +2,7 @@ package com.brohkahn.pingserver;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -37,7 +38,7 @@ public class PingListView extends AppCompatActivity {
 
 	public static String KEY_SERVER_ID = "serverId";
 
-	private int serverId;
+	private Server currentServer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +52,23 @@ public class PingListView extends AppCompatActivity {
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 
-		serverId = getIntent().getIntExtra(KEY_SERVER_ID, -1);
+		int serverId = getIntent().getIntExtra(KEY_SERVER_ID, -1);
 
-		CursorLoader cursorLoader = new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
+		if (serverId > -1) {
+			PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
+			currentServer = dbHelper.getServer(serverId);
+			dbHelper.close();
+
+			setTitle(currentServer.name);
+		}
+
+		final CursorLoader cursorLoader = new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
 			@Override
 			public Cursor loadInBackground() {
 				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
 				SQLiteDatabase db = dbHelper.getReadableDatabase();
-				return db.rawQuery(dbHelper.getPingSelect(serverId), null);
+
+				return db.rawQuery(dbHelper.getPingSelect(currentServer == null ? -1 : currentServer.id), null);
 			}
 		};
 
@@ -70,7 +80,11 @@ public class PingListView extends AppCompatActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.ping_list_view, menu);
+
+		if (currentServer != null) {
+			inflater.inflate(R.menu.ping_list_view, menu);
+		}
+
 		return true;
 	}
 
@@ -82,9 +96,19 @@ public class PingListView extends AppCompatActivity {
 				finish();
 				return true;
 			case R.id.action_deactivate:
-				showDeactivateDialog(serverId);
+				showDeactivateDialog(currentServer.id);
 				return true;
-
+			case R.id.action_view_on_web:
+				String url;
+				if (!currentServer.name.startsWith("http")) {
+					url = "http://" + currentServer.name;
+				} else {
+					url = currentServer.name;
+				}
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}

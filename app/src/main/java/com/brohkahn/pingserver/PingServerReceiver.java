@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 public class PingServerReceiver extends WakefulBroadcastReceiver {
+	public static final String TAG = "PingServerReceiver";
+	
 	public PingServerReceiver() {
 	}
 
@@ -13,6 +15,7 @@ public class PingServerReceiver extends WakefulBroadcastReceiver {
 		if (intent != null && intent.getAction().equals(Constants.ACTION_PING)) {
 			Intent newIntent = new Intent(context, PingServerService.class);
 			newIntent.setAction(Constants.ACTION_PING);
+			newIntent.putExtra(Constants.KEY_PING_INTENT_SOURCE, TAG);
 			startWakefulService(context, newIntent);
 		}
 	}

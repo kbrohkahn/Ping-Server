@@ -1,9 +1,11 @@
 package com.brohkahn.pingserver;
 
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -66,6 +68,13 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
+	private BroadcastReceiver pingsUpdatedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refreshResults();
+		}
+	};
+
 	private CursorLoader getCursorLoader() {
 		return new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
 			@Override
@@ -86,18 +95,28 @@ public class MainActivity extends AppCompatActivity {
 		super.onResume();
 
 		refreshResults();
-	}
 
+		IntentFilter intentFilter = new IntentFilter(Constants.ACTION_PINGS_UPDATED);
+		registerReceiver(pingsUpdatedReceiver, intentFilter);
+
+	}
 
 	@Override
 	protected void onPause() {
 		adapter.getCursor().close();
+
+		unregisterReceiver(pingsUpdatedReceiver);
 
 		super.onPause();
 	}
 
 
 	public void refreshResults() {
+		Cursor cursor = adapter.getCursor();
+		if (cursor != null && !cursor.isClosed()) {
+			cursor.close();
+		}
+
 		adapter.swapCursor(getCursorLoader().loadInBackground());
 	}
 
@@ -113,6 +132,12 @@ public class MainActivity extends AppCompatActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
+			case R.id.action_refresh_pings:
+				Intent newIntent = new Intent(this, PingServerService.class);
+				newIntent.setAction(Constants.ACTION_PING);
+				startService(newIntent);
+
+				return true;
 			case R.id.action_view_pings:
 				viewPings(-1);
 				return true;

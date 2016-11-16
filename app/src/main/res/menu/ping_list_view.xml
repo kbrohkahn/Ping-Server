@@ -3,6 +3,12 @@
 	  xmlns:app="http://schemas.android.com/apk/res-auto">
 
 	<item
+			android:id="@+id/action_view_on_web"
+			android:icon="@drawable/ic_public_white_24dp"
+			android:title="@string/action_view_on_web"
+			app:showAsAction="ifRoom"/>
+
+	<item
 			android:id="@+id/action_deactivate"
 			android:icon="@drawable/ic_delete_white_24dp"
 			android:title="@string/deactivate"

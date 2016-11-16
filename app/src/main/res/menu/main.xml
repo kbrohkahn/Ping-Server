@@ -3,6 +3,12 @@
 	  xmlns:app="http://schemas.android.com/apk/res-auto">
 
 	<item
+			android:id="@+id/action_refresh_pings"
+			android:icon="@drawable/ic_cached_white_24dp"
+			android:title="@string/action_refresh_pings"
+			app:showAsAction="ifRoom"/>
+
+	<item
 			android:id="@+id/action_view_pings"
 			android:title="@string/action_view_pings"
 			app:showAsAction="never"/>

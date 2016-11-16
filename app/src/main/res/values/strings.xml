@@ -16,7 +16,9 @@
 	<string name="general">General</string>
 
 	<!-- Actions and activities -->
-	<string name="action_view_pings">View pings</string>
+	<string name="action_view_pings">View all pings</string>
+	<string name="action_refresh_pings">Ping now</string>
+	<string name="action_view_on_web">View on web</string>
 	<string name="action_view_logs">View logs</string>
 	<string name="activity_add_ping">Add Ping</string>
 	<string name="activity_about">About</string>
