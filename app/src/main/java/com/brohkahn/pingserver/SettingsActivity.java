@@ -25,6 +25,7 @@ import android.view.MenuItem;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+	public static final String TAG = "SettingsActivity";
 
 	/**
 	 * A preference value change listener that updates the preference's summary
@@ -113,6 +114,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 				currentDelay = newDelay;
 				Intent intent = new Intent(getActivity(), StartTimerService.class);
 				intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+				intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 				getActivity().startService(intent);
 			}
 

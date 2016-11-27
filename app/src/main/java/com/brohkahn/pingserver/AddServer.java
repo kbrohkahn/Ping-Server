@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 public class AddServer extends AppCompatActivity {
+	public static final String TAG = "AddServer";
 
 	private EditText serverEditText;
 
@@ -70,6 +71,7 @@ public class AddServer extends AppCompatActivity {
 
 			Intent intent = new Intent(this, StartTimerService.class);
 			intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+			intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 			startService(intent);
 		}
 	}

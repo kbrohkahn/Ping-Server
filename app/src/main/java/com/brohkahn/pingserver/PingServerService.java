@@ -133,8 +133,8 @@ public class PingServerService extends IntentService {
 		}
 
 		sendBroadcast(new Intent(Constants.ACTION_PINGS_UPDATED));
-		
-		String intentSource = intent.getStringExtra(Constants.KEY_PING_INTENT_SOURCE);
+
+		String intentSource = intent.getStringExtra(Constants.KEY_INTENT_SOURCE);
 		if (intentSource != null && intentSource.equals(PingServerReceiver.TAG)) {
 			PingServerReceiver.completeWakefulIntent(intent);
 		}
