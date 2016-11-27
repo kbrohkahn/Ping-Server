@@ -39,11 +39,13 @@ public class StartTimerService extends IntentService {
 				int delay = Integer.parseInt(preferences.getString(delayKey, "5"));
 
 				// create intent and pending intent for DownloadRSSService
-				Intent pingIntent = new Intent(this, PingServerReceiver.class);
+				Intent pingIntent = new Intent(this, PingServerService.class);
+				pingIntent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 				pingIntent.setAction(Constants.ACTION_PING);
 
 				// create pending intent, cancel (if already running), and reschedule
-				PendingIntent schedulePingIntent = PendingIntent.getBroadcast(this, Constants.BROADCAST_PING_CODE, pingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent schedulePingIntent = PendingIntent.getService(this, Constants.BROADCAST_PING_CODE, pingIntent,
+						PendingIntent.FLAG_UPDATE_CURRENT);
 
 				AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 				alarmManager.cancel(schedulePingIntent);
