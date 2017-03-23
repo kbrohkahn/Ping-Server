@@ -143,8 +143,8 @@ public class PingListView extends AppCompatActivity {
 
 	public void deactivateServer(int id) {
 		PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
-		boolean success = pingDbHelper.deactivateServer(id);
 		Server server = pingDbHelper.getServer(id);
+		boolean success = pingDbHelper.deactivateServer(id);
 
 		pingDbHelper.close();
 
@@ -159,6 +159,11 @@ public class PingListView extends AppCompatActivity {
 		}
 		logEvent(message, "deactivateServer()", level);
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+		Intent intent = new Intent(this, StartTimerService.class);
+		intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+		intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
+		startService(intent);
 
 		finish();
 	}

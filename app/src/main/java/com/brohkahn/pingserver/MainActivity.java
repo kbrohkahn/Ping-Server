@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 			public Cursor loadInBackground() {
 				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
 				SQLiteDatabase db = dbHelper.getReadableDatabase();
+
 				return db.rawQuery(dbHelper.getServerSelect(), null);
 			}
 		};

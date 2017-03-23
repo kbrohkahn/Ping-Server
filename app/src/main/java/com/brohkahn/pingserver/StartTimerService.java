@@ -31,6 +31,18 @@ public class StartTimerService extends IntentService {
 			List<Server> servers = pingDbHelper.getActiveServers();
 			pingDbHelper.close();
 
+			// create intent and pending intent for DownloadRSSService
+			Intent pingIntent = new Intent(this, PingServerService.class);
+			pingIntent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
+			pingIntent.setAction(Constants.ACTION_PING);
+
+			// create pending intent, cancel (if already running), and reschedule
+			PendingIntent schedulePingIntent = PendingIntent.getService(this, Constants.BROADCAST_PING_CODE, pingIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+
+			AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			alarmManager.cancel(schedulePingIntent);
+
 			if (servers.size() == 0) {
 				logEvent("No servers found, pings not scheduled");
 			} else {
@@ -38,17 +50,6 @@ public class StartTimerService extends IntentService {
 				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 				int delay = Integer.parseInt(preferences.getString(delayKey, "5"));
 
-				// create intent and pending intent for DownloadRSSService
-				Intent pingIntent = new Intent(this, PingServerService.class);
-				pingIntent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
-				pingIntent.setAction(Constants.ACTION_PING);
-
-				// create pending intent, cancel (if already running), and reschedule
-				PendingIntent schedulePingIntent = PendingIntent.getService(this, Constants.BROADCAST_PING_CODE, pingIntent,
-						PendingIntent.FLAG_UPDATE_CURRENT);
-
-				AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-				alarmManager.cancel(schedulePingIntent);
 				alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, 0, MS_MINUTE * delay, schedulePingIntent);
 
 				logEvent(String.format(Locale.US, "Scheduled pingIntent every %d minutes", delay));

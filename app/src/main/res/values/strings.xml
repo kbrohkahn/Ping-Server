@@ -31,7 +31,7 @@
 
 	<!-- Add server -->
 	<string name="server_text_view">Enter server to ping:</string>
-	<string name="server_hint">espn.com</string>
+	<string name="server_hint">kevin.broh-kahn.com</string>
 
 	<!-- Deactivate server -->
 	<string name="deactivate_title">Stop pinging server</string>

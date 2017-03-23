@@ -17,9 +17,8 @@ import com.brohkahn.loggerlibrary.LogEntry;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,37 +59,56 @@ public class PingServerService extends IntentService {
 			for (Server server : servers) {
 				int result = Constants.PING_FAIL;
 
+				String fullServerName = "";
+				if (!server.name.startsWith("http://")) {
+					fullServerName += "http://";
+				}
+				fullServerName += server.name;
+
 				for (int tryCount = 0; tryCount < retries; tryCount++) {
+//					try {
+//						reachable = InetAddress.getByName(fullServerName).isReachable(timeout);
+//						if (reachable) {
+//							result = Constants.PING_SUCCESS;
+//							break;
+//						}
+//					} catch (UnknownHostException e) {
+//						result = Constants.PING_ERROR_HOST;
+//						logMessage = "UnknownHostException when pinging " + fullServerName;
+//						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
+//					} catch (IOException e) {
+//						result = Constants.PING_ERROR_IO;
+//						logMessage = "IOException when pinging " + fullServerName;
+//						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
+//					}
+
 					try {
-						boolean reachable = InetAddress.getByName(server.name).isReachable(timeout);
+						// try various java methods
+						URL url = new URL(fullServerName);
 
-						if (!reachable) {
-							// try various java methods
-							URL url = new URL(server.name);
-							HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-							connection.setConnectTimeout(timeout);
-							connection.connect();
-							reachable = connection.getResponseCode() == 200;
-						}
+						HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+						connection.setConnectTimeout(timeout);
+						connection.setRequestMethod("GET");
+						connection.setRequestProperty("Connection", "close");
+						connection.setReadTimeout(timeout + 5000);
+						connection.connect();
 
-
-						if (reachable) {
+						if (connection.getResponseCode() == 200) {
 							result = Constants.PING_SUCCESS;
 							break;
 						} else {
 							result = Constants.PING_FAIL;
 						}
-					} catch (UnknownHostException e) {
+					} catch (MalformedURLException e) {
 						result = Constants.PING_ERROR_HOST;
-
-						logMessage = String.format(Locale.US, "UnknownHostException when pinging %s.", server.name);
-						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
+						logMessage = "MalformedURLException when pinging " + fullServerName;
+						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 					} catch (IOException e) {
 						result = Constants.PING_ERROR_IO;
-
-						logMessage = String.format(Locale.US, "IOException when pinging %s.", server.name);
-						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
+						logMessage = "IOException when pinging " + fullServerName;
+						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 					}
+
 
 					try {
 						Thread.sleep(1000 * retryDelay);
@@ -104,13 +122,13 @@ public class PingServerService extends IntentService {
 
 
 				if (result != Constants.PING_SUCCESS) {
-					logMessage = String.format(Locale.US, "Failed to ping %s.", server.name);
-					logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
+					logMessage = String.format(Locale.US, "Failed to ping %s.", fullServerName);
+					logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 
 					worstPing = server.lastResult;
 					failMessage += server.name + ", ";
 				} else {
-					logMessage = String.format(Locale.US, "Successfully pinged %s.", server.name);
+					logMessage = String.format(Locale.US, "Successfully pinged %s.", fullServerName);
 					logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
 				}
 
