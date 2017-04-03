@@ -138,6 +138,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries)));
 			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries_delay)));
 			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_date_format)));
+			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_schedule_end_time)));
+			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_schedule_start_time)));
 		}
 	}
 

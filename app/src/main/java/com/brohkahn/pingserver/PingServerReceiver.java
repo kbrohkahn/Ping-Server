@@ -26,5 +26,4 @@ public class PingServerReceiver extends WakefulBroadcastReceiver {
 			startWakefulService(context, newIntent);
 		}
 	}
-
 }

@@ -59,16 +59,23 @@
 	<string name="key_retries">retries</string>
 	<string name="key_retries_delay">retriesDelay</string>
 	<string name="key_date_format">dateFormat</string>
+	<string name="key_use_schedule">useSchedule</string>
+	<string name="key_schedule_start_time">scheduleStartTime</string>
+	<string name="key_schedule_end_time">scheduleEndTime</string>
 
-	<string name="title_delay">Ping Frequency (minutes)</string>
+	<string name="title_delay">Ping prequency (minutes)</string>
 	<string name="title_timeout_delay">Timeout (seconds)</string>
-	<string name="title_delay_inaccurate">Note: Frequency not exact</string>
+	<string name="title_delay_inaccurate">Note: frequency not exact</string>
 	<string name="title_retries">Retries before failure</string>
 	<string name="title_retry_delay">Delay before retry (seconds)</string>
 	<string name="title_date_format">Date format</string>
+	<string name="title_use_schedule">Use schedule</string>
+	<string name="title_schedule_start_time">Schedule start time</string>
+	<string name="title_schedule_end_time">Schedule end time</string>
 
 	<string name="default_date_format">MM/dd/yyyy HH:mm</string>
-
+	<string name="default_schedule_start_time">0600</string>
+	<string name="default_schedule_end_time">1900</string>
 
 
 	<string name="summary_delay_inaccurate">Android devices control timers differently, if pings aren\'t occurring
