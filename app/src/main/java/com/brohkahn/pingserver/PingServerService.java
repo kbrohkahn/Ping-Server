@@ -79,24 +79,35 @@ public class PingServerService extends IntentService {
 				for (Server server : servers) {
 					int result = Constants.PING_FAIL;
 
+					String urlWithHttp;
+					String urlWithoutHttp;
+					if (server.name.indexOf("http") == 0) {
+						urlWithHttp = server.name;
+						urlWithoutHttp = server.name.replace("http://", "").replace("https://", "");
+					} else {
+						urlWithHttp = "http://" + server.name;
+						urlWithoutHttp = server.name;
+					}
+
+
 					for (int tryCount = 0; tryCount < retries; tryCount++) {
 						try {
-							boolean reachable = InetAddress.getByName(server.name).isReachable(timeout);
+							boolean reachable = InetAddress.getByName(urlWithoutHttp).isReachable(timeout);
 							if (reachable) {
 								result = Constants.PING_SUCCESS;
 								break;
 							}
 						} catch (UnknownHostException e) {
-							logMessage = "UnknownHostException when pinging " + server.name;
+							logMessage = "UnknownHostException when pinging " + urlWithoutHttp;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						} catch (IOException e) {
-							logMessage = "IOException when pinging " + server.name;
+							logMessage = "IOException when pinging " + urlWithoutHttp;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						}
 
 						try {
 							// try various java methods
-							URL url = new URL(server.name);
+							URL url = new URL(urlWithHttp);
 
 							HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 							connection.setConnectTimeout(timeout);
@@ -113,7 +124,7 @@ public class PingServerService extends IntentService {
 							}
 						} catch (MalformedURLException e) {
 							result = Constants.PING_ERROR_HOST;
-							logMessage = "MalformedURLException when pinging " + server.name;
+							logMessage = "MalformedURLException when pinging " + urlWithHttp;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						} catch (IOException e) {
 							result = Constants.PING_ERROR_IO;

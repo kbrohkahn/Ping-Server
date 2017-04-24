@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		adapter.swapCursor(getCursorLoader().loadInBackground());
+
+
 	}
 
 
