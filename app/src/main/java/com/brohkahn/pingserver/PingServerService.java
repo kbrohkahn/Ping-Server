@@ -79,30 +79,24 @@ public class PingServerService extends IntentService {
 				for (Server server : servers) {
 					int result = Constants.PING_FAIL;
 
-					String fullServerName = "";
-					if (!server.name.startsWith("http://")) {
-						fullServerName += "http://";
-					}
-					fullServerName += server.name;
-
 					for (int tryCount = 0; tryCount < retries; tryCount++) {
 						try {
-							boolean reachable = InetAddress.getByName(fullServerName).isReachable(timeout);
+							boolean reachable = InetAddress.getByName(server.name).isReachable(timeout);
 							if (reachable) {
 								result = Constants.PING_SUCCESS;
 								break;
 							}
 						} catch (UnknownHostException e) {
-							logMessage = "UnknownHostException when pinging " + fullServerName;
+							logMessage = "UnknownHostException when pinging " + server.name;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						} catch (IOException e) {
-							logMessage = "IOException when pinging " + fullServerName;
+							logMessage = "IOException when pinging " + server.name;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						}
 
 						try {
 							// try various java methods
-							URL url = new URL(fullServerName);
+							URL url = new URL(server.name);
 
 							HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 							connection.setConnectTimeout(timeout);
@@ -119,11 +113,11 @@ public class PingServerService extends IntentService {
 							}
 						} catch (MalformedURLException e) {
 							result = Constants.PING_ERROR_HOST;
-							logMessage = "MalformedURLException when pinging " + fullServerName;
+							logMessage = "MalformedURLException when pinging " + server.name;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						} catch (IOException e) {
 							result = Constants.PING_ERROR_IO;
-							logMessage = "IOException when pinging " + fullServerName;
+							logMessage = "IOException when pinging " + server.name;
 							logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 						}
 
@@ -140,13 +134,13 @@ public class PingServerService extends IntentService {
 
 
 					if (result != Constants.PING_SUCCESS) {
-						logMessage = String.format(Locale.US, "Failed to ping %s.", fullServerName);
+						logMessage = String.format(Locale.US, "Failed to ping %s.", server.name);
 						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Message);
 
 						worstPing = server.lastResult;
 						failMessage += server.name + ", ";
 					} else {
-						logMessage = String.format(Locale.US, "Successfully pinged %s.", fullServerName);
+						logMessage = String.format(Locale.US, "Successfully pinged %s.", server.name);
 						logEvent(logMessage, "PingServerTask", LogEntry.LogLevel.Trace);
 					}
 
