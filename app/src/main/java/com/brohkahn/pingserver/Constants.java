@@ -11,7 +11,7 @@ class Constants {
 	static final int BROADCAST_PING_CODE = 17594944;
 
 	private static final String PACKAGE_ACTION = "com.brohkahn.pingserver.action.";
-	static final String ACTION_RESCHEDULE_PINGS = PACKAGE_ACTION + "reschedule_pings";
+//	static final String ACTION_RESCHEDULE_PINGS = PACKAGE_ACTION + "reschedule_pings";
 	static final String ACTION_PING = PACKAGE_ACTION + "ping";
 	static final String ACTION_PINGS_UPDATED = PACKAGE_ACTION + "pings_updated";
 

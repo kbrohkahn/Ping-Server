@@ -1,15 +1,19 @@
 package com.brohkahn.pingserver;
 
 
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
@@ -58,27 +62,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 	};
 
 
-	/**
-	 * Binds a preference's summary to its value. More specifically, when the
-	 * preference's value is changed, its summary (line of text below the
-	 * preference title) is updated to reflect the value. The summary is also
-	 * immediately updated upon calling this method. The exact display format is
-	 * dependent on the type of preference.
-	 *
-	 * @see #sBindPreferenceSummaryToValueListener
-	 */
-	private static void bindPreferenceSummaryToValue(Preference preference) {
-		// Set the listener to watch for value changes.
-		preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-		// Trigger the listener immediately with the preference's
-		// current value.
-		sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-				PreferenceManager
-						.getDefaultSharedPreferences(preference.getContext())
-						.getString(preference.getKey(), ""));
-	}
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -101,22 +84,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 		}
 	}
 
+
 	public static class SettingsFragment extends PreferenceFragment {
-		public int currentDelay;
 
 		@Override
 		public void onStop() {
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			String delayKey = getResources().getString(R.string.key_delay);
-			int newDelay = Integer.parseInt(preferences.getString(delayKey, "5"));
-
-			if (currentDelay != newDelay) {
-				currentDelay = newDelay;
-				Intent intent = new Intent(getActivity(), StartTimerService.class);
-				intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
-				intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
-				getActivity().startService(intent);
-			}
+			Intent intent = new Intent(getActivity(), PingServerService.class);
+			intent.setAction(Constants.ACTION_PING);
+			intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
+			getActivity().startService(intent);
 
 			super.onStop();
 		}
@@ -129,17 +105,55 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 			Resources resources = getResources();
 
-			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-			String delayKey = resources.getString(R.string.key_delay);
-			currentDelay = Integer.parseInt(preferences.getString(delayKey, "5"));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_delay));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_timeout));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_retries));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_retries_delay));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_date_format));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_schedule_end_time));
+			bindPreferenceSummaryToValue(resources.getString(R.string.key_schedule_start_time));
 
-			bindPreferenceSummaryToValue(findPreference(delayKey));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_timeout)));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries)));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_retries_delay)));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_date_format)));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_schedule_end_time)));
-			bindPreferenceSummaryToValue(findPreference(resources.getString(R.string.key_schedule_start_time)));
+			Preference useStrictAlarmsPreference = findPreference(resources.getString(R.string.key_strict_alarm));
+			if (useStrictAlarmsPreference != null) {
+				useStrictAlarmsPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+					@Override
+					public boolean onPreferenceChange(Preference preference, Object newValue) {
+						if ((boolean) newValue) {
+
+							checkForDozePermission();
+						}
+						return true;
+					}
+				});
+			}
+		}
+
+		private void checkForDozePermission() {
+			if (Build.VERSION.SDK_INT >= 23) {
+				PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+				String packageName = getContext().getPackageName();
+
+				if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+					Intent whiteListIntent = new Intent();
+					whiteListIntent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+					whiteListIntent.setData(Uri.parse("package:" + packageName));
+					startActivity(whiteListIntent);
+				}
+			}
+		}
+
+		private void bindPreferenceSummaryToValue(String key) {
+			Preference preference = findPreference(key);
+			if (preference != null) {
+				preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+
+				// Trigger the listener immediately with the preference's
+				// current value.
+				sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
+						PreferenceManager
+								.getDefaultSharedPreferences(preference.getContext())
+								.getString(preference.getKey(), ""));
+			}
 		}
 	}
 

@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         applicationId "com.brohkahn.pingserver"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 25
         vectorDrawables.useSupportLibrary = true
         return void

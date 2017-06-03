@@ -54,6 +54,7 @@
 
 	<!-- Settings -->
 	<!--<string name="server_key">server</string>-->
+	<string name="key_strict_alarm">strictAlarms</string>
 	<string name="key_delay">delay</string>
 	<string name="key_timeout">timeout</string>
 	<string name="key_retries">retries</string>
@@ -63,7 +64,8 @@
 	<string name="key_schedule_start_time">scheduleStartTime</string>
 	<string name="key_schedule_end_time">scheduleEndTime</string>
 
-	<string name="title_delay">Ping prequency (minutes)</string>
+	<string name="title_strict_alarms">Use strict alarms</string>
+	<string name="title_delay">Ping frequency (minutes)</string>
 	<string name="title_timeout_delay">Timeout (seconds)</string>
 	<string name="title_delay_inaccurate">Note: frequency not exact</string>
 	<string name="title_retries">Retries before failure</string>
@@ -77,7 +79,7 @@
 	<string name="default_schedule_start_time">0600</string>
 	<string name="default_schedule_end_time">1900</string>
 
-
+	<string name="summary_strict_alarm">Requires frequent device wakeups</string>
 	<string name="summary_delay_inaccurate">Android devices control timers differently, if pings aren\'t occurring
 		at the above frequency try changing it by 20%.</string>
 

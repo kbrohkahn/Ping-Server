@@ -12,8 +12,8 @@ public class BootCompletedReceiver extends WakefulBroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent != null && intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-			Intent newIntent = new Intent(context, StartTimerService.class);
-			newIntent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+			Intent newIntent = new Intent(context, PingServerService.class);
+			newIntent.setAction(Constants.ACTION_PING);
 			newIntent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 			startWakefulService(context, newIntent);
 		}

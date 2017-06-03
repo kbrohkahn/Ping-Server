@@ -69,8 +69,8 @@ public class AddServer extends AppCompatActivity {
 			helper.saveServer(serverName);
 			helper.close();
 
-			Intent intent = new Intent(this, StartTimerService.class);
-			intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+			Intent intent = new Intent(this, PingServerService.class);
+			intent.setAction(Constants.ACTION_PING);
 			intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 			startService(intent);
 		}

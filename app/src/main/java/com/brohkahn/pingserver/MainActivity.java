@@ -11,8 +11,11 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
@@ -65,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
 		NotificationManager mNotificationManager =
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(Constants.NOTIFICATION_ID);
-
 	}
 
 	private BroadcastReceiver pingsUpdatedReceiver = new BroadcastReceiver() {
@@ -95,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 
-		refreshResults();
-
 		IntentFilter intentFilter = new IntentFilter(Constants.ACTION_PINGS_UPDATED);
 		registerReceiver(pingsUpdatedReceiver, intentFilter);
 
@@ -119,8 +119,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		adapter.swapCursor(getCursorLoader().loadInBackground());
-
-
 	}
 
 
@@ -136,9 +134,10 @@ public class MainActivity extends AppCompatActivity {
 		// Handle item selection
 		switch (item.getItemId()) {
 			case R.id.action_refresh_pings:
-				Intent newIntent = new Intent(this, PingServerService.class);
-				newIntent.setAction(Constants.ACTION_PING);
-				startService(newIntent);
+				Intent intent = new Intent(this, PingServerService.class);
+				intent.setAction(Constants.ACTION_PING);
+				intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
+				startService(intent);
 
 				return true;
 			case R.id.action_view_pings:
@@ -159,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	public class ServerListAdapter extends CursorAdapter {
+	private class ServerListAdapter extends CursorAdapter {
 
 		private SimpleDateFormat dateFormat;
 		private int successColor;

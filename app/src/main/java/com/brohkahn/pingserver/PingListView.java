@@ -160,8 +160,8 @@ public class PingListView extends AppCompatActivity {
 		logEvent(message, "deactivateServer()", level);
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
-		Intent intent = new Intent(this, StartTimerService.class);
-		intent.setAction(Constants.ACTION_RESCHEDULE_PINGS);
+		Intent intent = new Intent(this, PingServerService.class);
+		intent.setAction(Constants.ACTION_PING);
 		intent.putExtra(Constants.KEY_INTENT_SOURCE, TAG);
 		startService(intent);
 
