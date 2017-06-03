@@ -85,5 +85,11 @@
 				android:singleLine="true"
 				android:title="@string/title_schedule_end_time"/>
 
+		<SwitchPreference
+				android:defaultValue="false"
+				android:key="@string/key_notify_subsequent_failures"
+				android:summary="@string/summary_notify_subsequent_failures"
+				android:title="@string/title_notify_subsequent_failures"/>
+
 	</PreferenceCategory>
 </PreferenceScreen>

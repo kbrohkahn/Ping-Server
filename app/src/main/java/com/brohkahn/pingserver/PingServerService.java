@@ -21,10 +21,7 @@ import com.brohkahn.loggerlibrary.LogDBHelper;
 import com.brohkahn.loggerlibrary.LogEntry;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.List;
@@ -50,6 +47,7 @@ public class PingServerService extends IntentService {
 			Resources resources = getResources();
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+			boolean notifySubsequentFailures = preferences.getBoolean(resources.getString(R.string.key_notify_subsequent_failures), false);
 			boolean strictAlarm = preferences.getBoolean(resources.getString(R.string.key_strict_alarm), false);
 			int delay = Integer.parseInt(preferences.getString(resources.getString(R.string.key_delay), "5"));
 
@@ -109,19 +107,19 @@ public class PingServerService extends IntentService {
 					String failMessage = "Failed to ping servers: ";
 
 					for (Server server : servers) {
-						int result = Constants.PING_FAIL;
 
-						String urlWithHttp;
+//						String urlWithHttp;
 						String urlWithoutHttp;
 						if (server.name.indexOf("http") == 0) {
-							urlWithHttp = server.name;
+//							urlWithHttp = server.name;
 							urlWithoutHttp = server.name.replace("http://", "").replace("https://", "");
 						} else {
-							urlWithHttp = "http://" + server.name;
+//							urlWithHttp = "http://" + server.name;
 							urlWithoutHttp = server.name;
 						}
 
 
+						int result = Constants.PING_FAIL;
 						for (int tryCount = 0; tryCount < retries; tryCount++) {
 							try {
 								boolean reachable = InetAddress.getByName(urlWithoutHttp).isReachable(timeout);
@@ -140,36 +138,35 @@ public class PingServerService extends IntentService {
 								logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
 							}
 
-							try {
-								// try various java methods
-								URL url = new URL(urlWithHttp);
-
-								HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-								connection.setConnectTimeout(timeout);
-								connection.setRequestMethod("GET");
-								connection.setRequestProperty("Connection", "close");
-								connection.setReadTimeout(timeout + 5000);
-								connection.connect();
-
-								if (connection.getResponseCode() == 200) {
-									result = Constants.PING_SUCCESS;
-									break;
-								} else {
-									result = Constants.PING_FAIL;
-
-									logMessage = "Failed to ping " + urlWithoutHttp + " via url.openConnection";
-									logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
-								}
-							} catch (MalformedURLException e) {
-								result = Constants.PING_ERROR_HOST;
-								logMessage = "MalformedURLException when pinging " + urlWithHttp;
-								logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
-							} catch (IOException e) {
-								result = Constants.PING_ERROR_IO;
-								logMessage = "IOException when pinging " + server.name;
-								logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
-							}
-
+//							try {
+//								// try various java methods
+//								URL url = new URL(urlWithHttp);
+//
+//								HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//								connection.setConnectTimeout(timeout);
+//								connection.setRequestMethod("GET");
+//								connection.setRequestProperty("Connection", "close");
+//								connection.setReadTimeout(timeout + 5000);
+//								connection.connect();
+//
+//								if (connection.getResponseCode() == 200) {
+//									result = Constants.PING_SUCCESS;
+//									break;
+//								} else {
+//									result = Constants.PING_FAIL;
+//
+//									logMessage = "Failed to ping " + urlWithoutHttp + " via url.openConnection";
+//									logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
+//								}
+//							} catch (MalformedURLException e) {
+//								result = Constants.PING_ERROR_HOST;
+//								logMessage = "MalformedURLException when pinging " + urlWithHttp;
+//								logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
+//							} catch (IOException e) {
+//								result = Constants.PING_ERROR_IO;
+//								logMessage = "IOException when pinging " + server.name;
+//								logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
+//							}
 
 							try {
 								Thread.sleep(1000 * retryDelay);
@@ -178,16 +175,16 @@ public class PingServerService extends IntentService {
 										TAG,
 										LogEntry.LogLevel.Warning);
 							}
-
 						}
-
 
 						if (result != Constants.PING_SUCCESS) {
 							logMessage = String.format(Locale.US, "Failed to ping %s.", server.name);
 							logEvent(logMessage, TAG, LogEntry.LogLevel.Message);
 
-							worstPing = server.lastResult;
-							failMessage += server.name + ", ";
+							if (notifySubsequentFailures || server.lastResult == Constants.PING_SUCCESS) {
+								worstPing = result;
+								failMessage += server.name + ", ";
+							}
 						} else {
 							logMessage = String.format(Locale.US, "Successfully pinged %s.", server.name);
 							logEvent(logMessage, TAG, LogEntry.LogLevel.Trace);
@@ -196,6 +193,7 @@ public class PingServerService extends IntentService {
 						// store result in server object for batch saving
 						server.lastResult = result;
 					}
+
 
 					// save results
 					PingDbHelper helper = PingDbHelper.getHelper(this);

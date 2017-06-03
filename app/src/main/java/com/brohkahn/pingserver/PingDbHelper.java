@@ -93,7 +93,8 @@ class PingDbHelper extends SQLiteOpenHelper {
 				" on s." + ServerColumns._ID + "=p." + PingResultColumns.COLUMN_NAME_RELATED_SERVER +
 				" where s." + ServerColumns.COLUMN_NAME_ACTIVE + "=1" +
 				" group by s." + ServerColumns._ID +
-				" order by s." + ServerColumns.COLUMN_NAME_SERVER + " asc";
+				" order by s." + ServerColumns.COLUMN_NAME_SERVER + " asc" +
+				" , p." + PingResultColumns.COLUMN_NAME_DATE + " desc";
 	}
 
 	List<Server> getActiveServers() {
@@ -109,8 +110,7 @@ class PingDbHelper extends SQLiteOpenHelper {
 			Server server = new Server(
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns._ID)),
 					cursor.getString(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_SERVER)),
-//					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)),
-					0,
+					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)),
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_ACTIVE)) == 1
 			);
 

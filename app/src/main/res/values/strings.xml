@@ -63,6 +63,7 @@
 	<string name="key_use_schedule">useSchedule</string>
 	<string name="key_schedule_start_time">scheduleStartTime</string>
 	<string name="key_schedule_end_time">scheduleEndTime</string>
+	<string name="key_notify_subsequent_failures">notifySubsequentFailures</string>
 
 	<string name="title_strict_alarms">Use strict alarms</string>
 	<string name="title_delay">Ping frequency (minutes)</string>
@@ -74,6 +75,7 @@
 	<string name="title_use_schedule">Use schedule</string>
 	<string name="title_schedule_start_time">Schedule start time</string>
 	<string name="title_schedule_end_time">Schedule end time</string>
+	<string name="title_notify_subsequent_failures">Notify of subsequent failures</string>
 
 	<string name="default_date_format">MM/dd/yyyy HH:mm</string>
 	<string name="default_schedule_start_time">0600</string>
@@ -82,5 +84,7 @@
 	<string name="summary_strict_alarm">Requires frequent device wakeups</string>
 	<string name="summary_delay_inaccurate">Android devices control timers differently, if pings aren\'t occurring
 		at the above frequency try changing it by 20%.</string>
+	<string name="summary_notify_subsequent_failures">When off, only notify when a ping fails immediately after a
+		success</string>
 
 </resources>
