@@ -72,7 +72,7 @@ class PingDbHelper extends SQLiteOpenHelper {
 		for (Server server : servers) {
 			ContentValues values = new ContentValues();
 			values.put(PingResultColumns.COLUMN_NAME_RELATED_SERVER, server.id);
-			values.put(PingResultColumns.COLUMN_NAME_RESULT, server.lastResult);
+			values.put(PingResultColumns.COLUMN_NAME_RESULT, server.lastPing.result);
 			values.put(PingResultColumns.COLUMN_NAME_DATE, new Date().getTime());
 
 			inserts += db.insert(PingResultColumns.TABLE_NAME, null, values);
@@ -107,10 +107,15 @@ class PingDbHelper extends SQLiteOpenHelper {
 		List<Server> servers = new ArrayList<>();
 		boolean valuesInCursor = cursor.moveToFirst();
 		while (valuesInCursor) {
+			Ping lastPing = new Ping(
+					cursor.getString(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_DATE)),
+					cursor.getString(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_SERVER)),
+					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)));
+
 			Server server = new Server(
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns._ID)),
 					cursor.getString(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_SERVER)),
-					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)),
+					lastPing,
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_ACTIVE)) == 1
 			);
 
@@ -141,8 +146,7 @@ class PingDbHelper extends SQLiteOpenHelper {
 			server = new Server(
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns._ID)),
 					cursor.getString(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_SERVER)),
-//					cursor.getInt(cursor.getColumnIndexOrThrow(PingResultColumns.COLUMN_NAME_RESULT)),
-					0,
+					null,
 					cursor.getInt(cursor.getColumnIndexOrThrow(ServerColumns.COLUMN_NAME_ACTIVE)) == 1
 			);
 		}

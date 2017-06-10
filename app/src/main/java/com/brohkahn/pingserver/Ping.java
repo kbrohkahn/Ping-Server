@@ -1,13 +1,13 @@
 package com.brohkahn.pingserver;
 
-public class Ping {
-    public String date;
-    public String server;
-    public int result;
+class Ping {
+	String date;
+	String server;
+	int result;
 
-    public Ping(String date, String server, int result) {
-        this.date = date;
-        this.server = server;
-        this.result = result;
-    }
+	public Ping(String date, String server, int result) {
+		this.date = date;
+		this.server = server;
+		this.result = result;
+	}
 }

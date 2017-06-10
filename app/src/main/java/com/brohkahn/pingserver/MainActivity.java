@@ -8,15 +8,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +31,9 @@ import com.brohkahn.loggerlibrary.LogEntry;
 import com.brohkahn.loggerlibrary.LogViewList;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,11 +57,10 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 
-		adapter = new ServerListAdapter(this, getCursorLoader().loadInBackground(), 0);
+		adapter = new ServerListAdapter(this);
 		((ListView) findViewById(R.id.main_list_view)).setAdapter(adapter);
 
-		NotificationManager mNotificationManager =
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(Constants.NOTIFICATION_ID);
 	}
 
@@ -74,17 +71,17 @@ public class MainActivity extends AppCompatActivity {
 		}
 	};
 
-	private CursorLoader getCursorLoader() {
-		return new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
-			@Override
-			public Cursor loadInBackground() {
-				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
-				SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-				return db.rawQuery(dbHelper.getServerSelect(), null);
-			}
-		};
-	}
+//	private CursorLoader getCursorLoader() {
+//		return new CursorLoader(this, Uri.EMPTY, null, null, null, null) {
+//			@Override
+//			public Cursor loadInBackground() {
+//				PingDbHelper dbHelper = PingDbHelper.getHelper(getApplicationContext());
+//				SQLiteDatabase db = dbHelper.getReadableDatabase();
+//
+//				return db.rawQuery(dbHelper.getServerSelect(), null);
+//			}
+//		};
+//	}
 
 	private void startAddPingActivity() {
 		startActivity(new Intent(this, AddServer.class));
@@ -97,25 +94,22 @@ public class MainActivity extends AppCompatActivity {
 		IntentFilter intentFilter = new IntentFilter(Constants.ACTION_PINGS_UPDATED);
 		registerReceiver(pingsUpdatedReceiver, intentFilter);
 
+		refreshResults();
 	}
 
 	@Override
 	protected void onPause() {
-		adapter.getCursor().close();
-
 		unregisterReceiver(pingsUpdatedReceiver);
 
 		super.onPause();
 	}
 
-
 	public void refreshResults() {
-		Cursor cursor = adapter.getCursor();
-		if (cursor != null && !cursor.isClosed()) {
-			cursor.close();
-		}
+		PingDbHelper pingDbHelper = PingDbHelper.getHelper(this);
+		List<Server> servers = pingDbHelper.getActiveServers();
+		pingDbHelper.close();
 
-		adapter.swapCursor(getCursorLoader().loadInBackground());
+		adapter.updateDataSet(servers);
 	}
 
 
@@ -155,14 +149,20 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private class ServerListAdapter extends CursorAdapter {
 
+	private class ServerListAdapter extends BaseAdapter {
+		private List<Server> servers = new ArrayList<>();
+
+		private LayoutInflater layoutInflater;
 		private SimpleDateFormat dateFormat;
 		private int successColor;
 		private int failColor;
 
-		private ServerListAdapter(Context context, Cursor cursor, int flags) {
-			super(context, cursor, flags);
+		ServerListAdapter(Context context) {
+			super();
+
+			layoutInflater = LayoutInflater.from(context);
+			servers = new ArrayList<>();
 
 			Resources resources = context.getResources();
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -175,49 +175,75 @@ public class MainActivity extends AppCompatActivity {
 			failColor = ContextCompat.getColor(context, R.color.fail);
 		}
 
-		public void bindView(View view, Context context, Cursor cursor) {
-			TextView dateTextView = (TextView) view.findViewById(R.id.ping_date);
+		private void updateDataSet(List<Server> servers) {
+			this.servers = servers;
+			notifyDataSetChanged();
+		}
 
-			long timeInMillis = cursor.getLong(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns
-					.COLUMN_NAME_DATE));
-			if (timeInMillis > 0) {
-				Date date = new Date(timeInMillis);
-				dateTextView.setText(dateFormat.format(date));
-			} else {
-				dateTextView.setText("");
+		@Override
+		public int getCount() {
+			return servers.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+//				convertView = layoutInflater.inflate(R.layout.ping_list_item, null);
+				convertView = layoutInflater.inflate(R.layout.ping_list_item, parent, false);
 			}
 
-			TextView serverTextView = (TextView) view.findViewById(R.id.ping_server);
-			serverTextView.setText(cursor.getString(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns.COLUMN_NAME_SERVER)));
+			Server server = servers.get(position);
 
-			int result = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.PingResultColumns.COLUMN_NAME_RESULT));
+			String dateText = "";
+			if (server.lastPing != null && server.lastPing.date != null) {
+				long timeInMillis = Long.valueOf(server.lastPing.date);
+				if (timeInMillis > 0) {
+					Date date = new Date(timeInMillis);
+					dateText = dateFormat.format(date);
+				}
+			}
+			TextView dateTextView = (TextView) convertView.findViewById(R.id.ping_date);
+			dateTextView.setText(dateText);
+
+			TextView serverTextView = (TextView) convertView.findViewById(R.id.ping_server);
+			serverTextView.setText(server.name);
+
+			int result = server.lastPing.result;
 			if (result == Constants.PING_SUCCESS) {
-				view.setBackgroundColor(successColor);
+				convertView.setBackgroundColor(successColor);
 			} else {
-				view.setBackgroundColor(failColor);
+				convertView.setBackgroundColor(failColor);
 			}
 
-			final int id = cursor.getInt(cursor.getColumnIndexOrThrow(PingDbHelper.ServerColumns._ID));
-			view.setOnClickListener(new View.OnClickListener() {
+			final int id = server.id;
+			convertView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
 					viewPings(id);
 				}
 			});
 
-			view.setOnLongClickListener(new View.OnLongClickListener() {
+			convertView.setOnLongClickListener(new View.OnLongClickListener() {
 				@Override
 				public boolean onLongClick(View view) {
 					showDeactivateDialog(id);
 					return true;
 				}
 			});
+
+			return convertView;
 		}
 
-		public View newView(Context context, Cursor cursor, ViewGroup parent) {
-			return LayoutInflater.from(context)
-					.inflate(R.layout.ping_list_item, parent, false);
-		}
 	}
 
 

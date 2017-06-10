@@ -53,7 +53,6 @@
 		</receiver>
 
 		<service android:name=".PingServerService"/>
-		<service android:name=".StartTimerService"/>
 
 	</application>
 
